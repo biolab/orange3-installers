@@ -1,0 +1,62 @@
+language: generic
+os: osx
+
+env:
+  global:
+    # Branch (or any remote ref, i.e. pull/10/head) to fetch
+    - BUILD_BRANCH=master
+    # Commit tag/ref to checkout
+    - BUILD_COMMIT=HEAD
+
+cache:
+  ccache: true
+  directories:
+    - ~/Library/Caches/pip
+    # cache used by build-macos-app.sh
+    - ~/.cache/pkgs
+
+before_install:
+  - git clone -q --depth 20 https://github.com/biolab/orange3.git
+  - cd orange3
+  - git fetch origin $BUILD_BRANCH
+  - git checkout $BUILD_COMMIT
+
+install:
+  - if [[ -d /Applications/Orange3.app ]]; then rm -rf /Applications/Orange3.app; fi
+  # TODO: If this is a tagged commit, then it would be preferable to use
+  #       the (to be) published whl files (i.e. from the staging index so the
+  #       wheels, installers, .. can go live at the same time)
+  - ./scripts/macos/build-macos-app.sh --pip-arg={-r,scripts/macos/requirements.txt,./} /Applications/Orange3.app
+  - ./scripts/macos/create-dmg-installer.sh --app /Applications/Orange3.app dist/Orange3.dmg
+  #  reversed("LMAY KCUF")
+  - "VERSION=$(/Applications/Orange3.app/Contents/MacOS/pip show orange3 | grep -E '^Version: ' | cut -d ' ' -f 2)"
+  - mv dist/Orange3.dmg dist/Orange3-$VERSION.dmg
+  - cd ..
+
+script:
+  # run the tests in the application's environment, but move it to a different
+  # location first
+  - mkdir -p ~/Applications
+  - mv -f /Applications/Orange3.app ~/Applications/
+  - ~/Applications/Orange3.app/Contents/MacOS/python --version
+  - ~/Applications/Orange3.app/Contents/MacOS/pip --version
+  - ~/Applications/Orange3.app/Contents/MacOS/pip freeze
+
+  # Don't even ask
+  - export ORANGE_DEPRECATIONS_ERROR=1
+  - export PYTHONWARNINGS=module
+  - ~/Applications/Orange3.app/Contents/MacOS/python -m unittest Orange.tests Orange.widgets.tests
+
+after_success:
+  - if [ ! $TRAVIS_TAG ]; then curl -fS --upload-file orange3/dist/Orange3-*.dmg https://transfer.sh/; fi
+
+deploy:
+  provider: releases
+  api_key:
+    secure: itI2Xr5qAqQy0PQqk2fN/d+lCg1JFvmDTEJQOOt8Lc+Kjwh+IipYzmMgEFqN93/jcSE/Tbrlcd1r45YaY0Mui6lpo7kUzsGR190VIKFX1yakhVEbVV0a31X4NNzuIO/O2A/7IHvKu18GpCUNwTEVmmpEevEBNvKOP/oZy8Ksy3vJaZQOnyc1G11MxbvxEuW4zWQgC3TRUCE0PSIVz8v6f3njF4lFOPIlaypDysJ6BLR+isHxV2WBK53mQ77U/AizOSID4O9Pr9G776snxDHbb4FeWTjWZtG1KaL9arNOAR3E6NKRguqT8QSTU3dqo03qNAwXORlyc+HU8R85CzZcXT3cZnIfbCc5AvwjwouOk2e2mdKxhez845N1f74HqjaVmN/jK23TTJcVVI+l6w3ikghQBMZYt9trtfOIYH+6SGe9gh4IPi3vn4WSoqwt/1UriDsBy50f7Fqt3cPJ+4Tp9Yt3weCrQSBzGEQO2yA1hMzdLTUdMJcjIMu/J46QvFDJvFzEk4r3HpdK1rQE4mjzZufg/zBO8I3wJGx+jZmEI000wXS3duUoW+1u23SIosCw4pQRpkSjb0hzhG+4b5acwEYoeoN3JmjY4finLAhW0opOc8GVpu+SzHYd9TJ1bAsGB2IWeAgYw0VChmPBiIa06I8XbSEYfib3tBJAu43hNe0=
+  file: orange3/dist/Orange3-*.dmg
+  file_glob: true
+  skip_cleanup: true
+  on:
+    tags: true
+    repo: ales-erjavec/orange3-installers
