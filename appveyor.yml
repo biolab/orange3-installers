@@ -1,47 +1,91 @@
 environment:
   global:
-    # Orange version
-    VERSION: 3.4.1
-    # Repo from which to pull
     REPO: https://github.com/ales-erjavec/orange3.git
-    # Branch to pull (can also be any ref on remote i.e.
-    # release-staging/$VERSION or even pull/1/head)
-    BRANCH: win-app-reboot
-    # commit id on branch (a tag or a sha identifier)
-    COMMIT: 3.4.1
+    # Branch/ref from which to pull
+    BUILD_BRANCH: win-app-reboot
+    # Commit ref/tag to checkout
+    BUILD_COMMIT: FETCH_HEAD
 
+    # fixes build env dependencies for building orange3 wheels
+    BUILD_DEPS: --only-binary numpy --extra-index-url=https://pypi.anaconda.org/ales-erjavec/simple numpy==1.9.3 wheel
+
+  # Note the python version here referes to the one included in the installer
+  # not the one used for building/packaging
   matrix:
-    - SPECARGS: --platform win32 --python-version 3.4.4
-      PYTAG: 34
+    - PYTHON_VERSION: 3.4.4
       PLATTAG: win32
+      ENVSPEC: scripts/windows/specs/PY34-win32.txt
 
-    - SPECARGS: --platform win_amd64 --python-version 3.5.3
-      PYTAG: 35
-      PLATTAG: win_amd64
+      PYTHON: C:\Python34
+
+matrix:
+  fast_finish: true
 
 cache:
-  - '%LOCALAPPDATA%\pip\Cache'
+  - '%LOCALAPPDATA%\pip\Cache' -> appveyor.yml
 
 build_script:
-  - git clone --depth 30 -q --branch "%BRANCH%" %REPO%
+  # assuming pyminor never goes over 9
+  - set PYTAG=%PYTHON_VERSION:~0,1%%PYTHON_VERSION:~2,1%
+  - set SPECARGS=--python-version %PYTHON_VERSION% --platform %PLATTAG% --pip-arg=-r --pip-arg=%ENVSPEC%
+  - echo PYTAG    = %PYTAG%
+  - echo SPECARGS = %SPECARGS%
+  - git clone -q --depth 20 %REPO%
   - cd orange3
-  - git checkout -qf "%COMMIT%"
-  - set PATH=C:\msys64\usr\bin;%PATH%
-  - set PATH=C:\Python35;C:\Python35\Scripts;%PATH%
-  - set PATH=C:\Program Files (x86)\NSIS;%PATH%
-  - bash orange3/scripts/windows/build-win-installer.sh %SPECARGS%
+  - git fetch origin %BUILD_BRANCH%
+  - git checkout %BUILD_COMMIT%
+
+  # Store/restore path around the build to not affect the tests later
+  - set PATH_BEFORE_BUILD=%PATH%
+  - set PATH=%PYTHON%;%PYTHON%\Scripts;%PATH%
+  # https://bugs.python.org/issue29943
+  - 'python -c "import sys; assert not sys.version_info[:3] == (3, 6, 1)"'
+  - python --version
+  - python -m pip --version
+  - python -m pip install %BUILD_DEPS%
+  - python setup.py %BUILD_OPTIONS% bdist_wheel -d ../wheels
+  - for /f %%s in ( 'python setup.py --version' ) do ( set VERSION=%%s )
+  # Strip newline from the end (.TrimEnd() does not work ????)
+  - ps: $Env:VERSION = ( ( $Env:VERSION + " " ).trim() )
+  - echo VERSION  = %VERSION%
+  # add msys2 and NSIS to path
+  - set PATH=C:\msys64\usr\bin;C:\Program Files (x86)\NSIS;%PATH%
+  - bash -c "pacman -S --noconfirm unzip"
+  - bash -c "which unzip"
+  - bash -e scripts/windows/build-win-installer.sh --find-links=../wheels --pip-arg=orange3==%VERSION% %SPECARGS%
+  - cd ..
+  - set INSTALLER=Orange3-%VERSION%-Python%PYTAG%-%PLATTAG%.exe
+
+  # restore original path
+  - set PATH=%PATH_BEFORE_BUILD%
 
 test_script:
-  - set INSTALLER=Orange3-%VERSION%-Python%PYTAG%-%PLATTAG%.exe
-  # install in silent mode
-  - dist/%INSTALLER% /S /D=C:\test-install > null
-  # run test suite
+  # Install in silent mode. Output has to be piped somewhere so the installer
+  # runs 'attached' to the console.
+  - dir orange3\dist
+  - orange3\dist\%INSTALLER% /S /D=C:\test-install > null
+
+  - C:\test-install\Scripts\python --version
+  - C:\test-install\Scripts\pip --version
+  - C:\test-install\Scripts\pip freeze
+  - C:\test-install\Scripts\pip install --no-index --no-cache-dir orange3
+
+  # Run test suite in the installed environment.
   - set ORANGE_DEPRECATIONS_ERROR=1
   - set PYTHONWARNINGS=module
-  - C:\test-install-dir\python -m unittest Orange.tests Orange.widgets.tests
-
+  - C:\test-install\Scripts\python -m unittest Orange.tests Orange.widgets.tests
   - mkdir installers
-  - move dist/%INSTALLER% installers\
+  - move orange3\dist\%INSTALLER% installers\
 
 artifacts:
   - path: installers\*
+
+deploy:
+  description: ''
+  provider: GitHub
+  auth_token:
+    secure: Nxnsu1AhdU0JXv7T18xJ9mWnLNe6/M1NND+tV6IYU8pdPs97hGbNaprSv2T24/N2
+  artifact: installers\*.exe
+  draft: True
+  on:
+    appveyor_repo_tag: true        # deploy on tag push only
