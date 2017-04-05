@@ -3,12 +3,14 @@ environment:
     # Orange version
     VERSION: 3.4.1
     # Repo from which to pull
+    #REPO: https://github.com/github/orange3.git
     REPO: https://github.com/ales-erjavec/orange3.git
     # Branch to pull (can also be any ref on remote i.e.
     # release-staging/$VERSION or even pull/1/head)
+    #BRANCH: master
     BRANCH: win-app-reboot
     # commit id on branch (a tag or a sha identifier)
-    COMMIT: 3.4.1
+    COMMIT: HEAD
 
   matrix:
     - SPECARGS: --platform win32 --python-version 3.4.4
@@ -26,22 +28,32 @@ build_script:
   - git clone --depth 30 -q --branch "%BRANCH%" %REPO%
   - cd orange3
   - git checkout -qf "%COMMIT%"
+  # Store/restore path around the build.
+  - set PATH_BEFORE_BUILD=%PATH%
+  # add msys2, python and NSIS to
   - set PATH=C:\msys64\usr\bin;%PATH%
   - set PATH=C:\Python35;C:\Python35\Scripts;%PATH%
   - set PATH=C:\Program Files (x86)\NSIS;%PATH%
-  - bash orange3/scripts/windows/build-win-installer.sh %SPECARGS%
+  - bash scripts/windows/build-win-installer.sh %SPECARGS%
+  - set PATH=%PATH_BEFORE_BUILD%
+  - cd ..
 
 test_script:
   - set INSTALLER=Orange3-%VERSION%-Python%PYTAG%-%PLATTAG%.exe
-  # install in silent mode
-  - dist/%INSTALLER% /S /D=C:\test-install > null
-  # run test suite
+  # Install in silent mode. Output has to be piped somewhere so the installer
+  # runs 'attached' to the console.
+  - orange3\dist\%INSTALLER% /S /D=C:\test-install > null
+
+  - C:\test-install\Scripts\python --version
+  - C:\test-install\Scripts\pip --version
+  - C:\test-install\Scripts\pip freeze
+
+  # Run test suite in the installed environment.
   - set ORANGE_DEPRECATIONS_ERROR=1
   - set PYTHONWARNINGS=module
-  - C:\test-install-dir\python -m unittest Orange.tests Orange.widgets.tests
-
+  - C:\test-install\Scripts\python -m unittest Orange.tests Orange.widgets.tests
   - mkdir installers
-  - move dist/%INSTALLER% installers\
+  - move orange3\dist\%INSTALLER% installers\
 
 artifacts:
   - path: installers\*
