@@ -57,3 +57,13 @@ test_script:
 
 artifacts:
   - path: installers\*
+
+deploy:
+  description: ''
+  provider: GitHub
+  auth_token:
+    secure: Nxnsu1AhdU0JXv7T18xJ9mWnLNe6/M1NND+tV6IYU8pdPs97hGbNaprSv2T24/N2
+  artifact: installers\*.exe
+  draft: True
+  on:
+    appveyor_repo_tag: true        # deploy on tag push only
