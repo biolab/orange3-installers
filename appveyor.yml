@@ -6,11 +6,13 @@ environment:
     #REPO: https://github.com/github/orange3.git
     REPO: https://github.com/ales-erjavec/orange3.git
     # Branch to pull (can also be any ref on remote i.e.
-    # release-staging/$VERSION or even pull/1/head)
+    # release-staging/$VERSION)
     #BRANCH: master
     BRANCH: win-app-reboot
     # commit id on branch (a tag or a sha identifier)
     COMMIT: HEAD
+    # If defined fetch and chekout this remote git reference (overrides COMMIT)
+    FETCH_REFSPEC: pull/2217/head
 
   matrix:
     - SPECARGS: --platform win32 --python-version 3.4.4
@@ -21,25 +23,40 @@ environment:
       PYTAG: 35
       PLATTAG: win_amd64
 
+    -
+
 cache:
   - '%LOCALAPPDATA%\pip\Cache'
 
 build_script:
-  - git clone --depth 30 -q --branch "%BRANCH%" %REPO%
+  - git clone --depth 30 -q --branch "%BRANCH%" "%REPO%"
   - cd orange3
-  - git checkout -qf "%COMMIT%"
+#  - ps: |
+#    if ( "$Env:FETCH_REFSPEC" != "" ) {
+#      git fetch origin "$Env:FETCH_REFSPEC"
+#      git checkout -qf FETCH_HEAD
+#    } else {
+#      git checkout "$Env:COMMIT"
+#    }
+  - if "%FETCH_REFSPEC%" != "" ( git fetch origin "%FETCH_REFSPEC%" )
+  - if "%FETCH_REFSPEC%" != "" ( git checkout -qf FETCH_HEAD )
+  - if "%FETCH_REFSPEC%" == "" ( git chechout -qf "%COMMIT%" )
+
   # Store/restore path around the build.
   - set PATH_BEFORE_BUILD=%PATH%
   # add msys2, python and NSIS to
   - set PATH=C:\msys64\usr\bin;%PATH%
-  - set PATH=C:\Python35;C:\Python35\Scripts;%PATH%
+  - if "%MINICONDA%" == "" ( set PATH=C:\Python35;C:\Python35\Scripts;%PATH% )
+  - if "%MINICONDA%" != "" ( set PATH=%MINICONDA%;%MINICONDA%\Scripts;%PATH% )
+  #- set PATH=C:\Python35;C:\Python35\Scripts;%PATH%
   - set PATH=C:\Program Files (x86)\NSIS;%PATH%
+  - if "%MINICONDA%" == "" ( bash scripts/windows/build-conda-installer.sh
   - bash scripts/windows/build-win-installer.sh %SPECARGS%
   - set PATH=%PATH_BEFORE_BUILD%
   - cd ..
+  - set INSTALLER=Orange3-%VERSION%-Python%PYTAG%-%PLATTAG%.exe
 
 test_script:
-  - set INSTALLER=Orange3-%VERSION%-Python%PYTAG%-%PLATTAG%.exe
   # Install in silent mode. Output has to be piped somewhere so the installer
   # runs 'attached' to the console.
   - orange3\dist\%INSTALLER% /S /D=C:\test-install > null
