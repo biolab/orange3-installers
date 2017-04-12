@@ -1,69 +1,85 @@
 environment:
   global:
-    # Orange version
-    VERSION: 3.4.1
-    # Repo from which to pull
-    #REPO: https://github.com/github/orange3.git
     REPO: https://github.com/ales-erjavec/orange3.git
-    # Branch to pull (can also be any ref on remote i.e.
-    # release-staging/$VERSION)
-    #BRANCH: master
-    BRANCH: win-app-reboot
-    # commit id on branch (a tag or a sha identifier)
-    COMMIT: HEAD
-    # If defined fetch and chekout this remote git reference (overrides COMMIT)
-    FETCH_REFSPEC: pull/2217/head
+    # Branch/ref from which to pull
+    BUILD_BRANCH: win-app-reboot
+    # Commit ref/tag to checkout
+    BUILD_COMMIT: FETCH_HEAD
 
+    # fixes build env dependencies for building orange3 wheels
+    BUILD_DEPS: --only-binary numpy --extra-index-url=https://pypi.anaconda.org/ales-erjavec/simple numpy==1.9.3 wheel
+
+  # Note the python version here referes to the one included in the installer
+  # not the one used for building/packaging
   matrix:
-    - SPECARGS: --platform win32 --python-version 3.4.4
-      PYTAG: 34
-      PLATTAG: win32
-
-    - SPECARGS: --platform win_amd64 --python-version 3.5.3
-      PYTAG: 35
+    - PYTHON_VERSION: 3.5.3
       PLATTAG: win_amd64
 
-    -
+      PYTHON: C:\Python35-x64
+      # https://github.com/numpy/numpy/issues/7607
+      BUILD_OPTIONS: build -j1
+
+    - PYTHON_VERSION: 3.4.4
+      PLATTAG: win32
+
+      PYTHON: C:\Python34
+
+matrix:
+  fast_finish: true
 
 cache:
   - '%LOCALAPPDATA%\pip\Cache'
 
 build_script:
-  - git clone --depth 30 -q --branch "%BRANCH%" "%REPO%"
+  # assuming pyminor never goes over 9
+  - set PYTAG=%PYTHON_VERSION:~0,1%%PYTHON_VERSION:~2,1%
+  - set SPECARGS=--python-version %PYTHON_VERSION% --platform %PLATTAG%
+  - echo PYTAG    = %PYTAG%
+  - echo SPECARGS = %SPECARGS%
+  - git clone -q --depth 20 %REPO%
   - cd orange3
-#  - ps: |
-#    if ( "$Env:FETCH_REFSPEC" != "" ) {
-#      git fetch origin "$Env:FETCH_REFSPEC"
-#      git checkout -qf FETCH_HEAD
-#    } else {
-#      git checkout "$Env:COMMIT"
-#    }
-  - if "%FETCH_REFSPEC%" != "" ( git fetch origin "%FETCH_REFSPEC%" )
-  - if "%FETCH_REFSPEC%" != "" ( git checkout -qf FETCH_HEAD )
-  - if "%FETCH_REFSPEC%" == "" ( git chechout -qf "%COMMIT%" )
+  - git fetch origin %BUILD_BRANCH%
+  - git checkout %BUILD_COMMIT%
 
-  # Store/restore path around the build.
+  # Store/restore path around the build to not affect the tests later
   - set PATH_BEFORE_BUILD=%PATH%
-  # add msys2, python and NSIS to
-  - set PATH=C:\msys64\usr\bin;%PATH%
-  - if "%MINICONDA%" == "" ( set PATH=C:\Python35;C:\Python35\Scripts;%PATH% )
-  - if "%MINICONDA%" != "" ( set PATH=%MINICONDA%;%MINICONDA%\Scripts;%PATH% )
-  #- set PATH=C:\Python35;C:\Python35\Scripts;%PATH%
-  - set PATH=C:\Program Files (x86)\NSIS;%PATH%
-  - if "%MINICONDA%" == "" ( bash scripts/windows/build-conda-installer.sh
-  - bash scripts/windows/build-win-installer.sh %SPECARGS%
-  - set PATH=%PATH_BEFORE_BUILD%
+  - set PATH=%PYTHON%;%PYTHON%\Scripts;%PATH%
+
+  - if not "%APPVEYOR_REPO_TAG%" == "" ( %PYTHON%\python -m pip install %BUILD_DEPS% )
+  - if not "%APPVEYOR_REPO_TAG%" == "" ( %PYTHON%\python setup.py %BUILD_OPTIONS% bdist_wheel -d ../wheels )
+  - if not "%APPVEYOR_REPO_TAG%" == "" ( for /f %%s in ( '%PYTHON%\python setup.py --version' ) do ( set VERSION=%%s ) )
+  # Strip newline from the end (.TrimEnd() does not work ????)
+  - ps: $Env:VERSION = ( ( $Env:VERSION + " " ).trim() )
+  - echo VERSION  = %VERSION%
+  #- ps: |
+  #    if (-not("$Env:APPVEYOR_REPO_TAG" -eq "")) {
+  #      & "$env:PYTHON" -m pip install ( $Env:BUILD_DEPS -split " " )
+  #      & "$env:PYTHON" setup.py ( $Env:BUILD_OPTIONS -split " " ) bdist_wheel -d ../wheels
+  #      $Env:VERSION = & "$env:PYTHON" setup.py --version
+  #      $Env:VERSION = ( ( $Env:VERSION + " " ).trim() )
+  #    }
+
+  # add msys2 and NSIS to path
+  - set PATH=C:\msys64\usr\bin;C:\Program Files (x86)\NSIS;%PATH%
+  - bash -c "pacman -S --noconfirm unzip"
+  - bash -c "which unzip"
+  - bash -e scripts/windows/build-win-installer.sh --find-links=../wheels --pip-arg=orange3==%VERSION% %SPECARGS%
   - cd ..
   - set INSTALLER=Orange3-%VERSION%-Python%PYTAG%-%PLATTAG%.exe
+
+  # restore original path
+  - set PATH=%PATH_BEFORE_BUILD%
 
 test_script:
   # Install in silent mode. Output has to be piped somewhere so the installer
   # runs 'attached' to the console.
+  - dir orange3\dist
   - orange3\dist\%INSTALLER% /S /D=C:\test-install > null
 
   - C:\test-install\Scripts\python --version
   - C:\test-install\Scripts\pip --version
   - C:\test-install\Scripts\pip freeze
+  - C:\test-install\Scripts\pip install --no-index --no-cache-dir orange3
 
   # Run test suite in the installed environment.
   - set ORANGE_DEPRECATIONS_ERROR=1
@@ -71,22 +87,6 @@ test_script:
   - C:\test-install\Scripts\python -m unittest Orange.tests Orange.widgets.tests
   - mkdir installers
   - move orange3\dist\%INSTALLER% installers\
-
-on_sucess:
-  - ps: |
-    cd installers
-    if ( $Env:APPVEYOR_REPO_TAG != true ) {
-      echo "=========================================="
-      echo "Cron builds. Get them while they are hot:"
-      $files = Get-ChildItem "installers\" -Filter *.exe |
-      Foreach-Object {
-        $file_url_path = $_.BaseName -replace "+=%20"
-        $url = & curl --upload-file "$_.BaseName" https://transfer.sh/$file_url_path
-        echo "$_.BaseName : $url"
-      }
-      echo "=========================================="
-    }
-
 
 artifacts:
   - path: installers\*
