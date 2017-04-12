@@ -72,6 +72,22 @@ test_script:
   - mkdir installers
   - move orange3\dist\%INSTALLER% installers\
 
+on_sucess:
+  - ps: |
+    cd installers
+    if ( $Env:APPVEYOR_REPO_TAG != true ) {
+      echo "=========================================="
+      echo "Cron builds. Get them while they are hot:"
+      $files = Get-ChildItem "installers\" -Filter *.exe |
+      Foreach-Object {
+        $file_url_path = $_.BaseName -replace "+=%20"
+        $url = & curl --upload-file "$_.BaseName" https://transfer.sh/$file_url_path
+        echo "$_.BaseName : $url"
+      }
+      echo "=========================================="
+    }
+
+
 artifacts:
   - path: installers\*
 
