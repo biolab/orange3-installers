@@ -30,7 +30,7 @@ matrix:
   fast_finish: true
 
 cache:
-  - '%LOCALAPPDATA%\pip\Cache'
+  - '%LOCALAPPDATA%\pip\Cache' -> appveyor.yml
 
 build_script:
   # assuming pyminor never goes over 9
@@ -46,10 +46,17 @@ build_script:
   # Store/restore path around the build to not affect the tests later
   - set PATH_BEFORE_BUILD=%PATH%
   - set PATH=%PYTHON%;%PYTHON%\Scripts;%PATH%
+  # https://bugs.python.org/issue29943
   - 'python -c "import sys; assert not sys.version_info[:3] == (3, 6, 1)"'
-  - if not "%APPVEYOR_REPO_TAG%" == "" ( %PYTHON%\python -m pip install %BUILD_DEPS% )
-  - if not "%APPVEYOR_REPO_TAG%" == "" ( %PYTHON%\python setup.py %BUILD_OPTIONS% bdist_wheel -d ../wheels )
-  - if not "%APPVEYOR_REPO_TAG%" == "" ( for /f %%s in ( '%PYTHON%\python setup.py --version' ) do ( set VERSION=%%s ) )
+  - python --version
+  - python -m pip --version
+  - python -m pip install %BUILD_DEPS%
+  - python setup.py %BUILD_OPTIONS% bdist_wheel -d ../wheels
+  - for /f %%s in ( 'python setup.py --version' ) do ( set VERSION=%%s )
+
+  #- if not "%APPVEYOR_REPO_TAG%" == "" ( python -m pip install %BUILD_DEPS% )
+  #- if not "%APPVEYOR_REPO_TAG%" == "" ( python setup.py %BUILD_OPTIONS% bdist_wheel -d ../wheels )
+  #- if not "%APPVEYOR_REPO_TAG%" == "" ( for /f %%s in ( 'python setup.py --version' ) do ( set VERSION=%%s ) )
   # Strip newline from the end (.TrimEnd() does not work ????)
   - ps: $Env:VERSION = ( ( $Env:VERSION + " " ).trim() )
   - echo VERSION  = %VERSION%
