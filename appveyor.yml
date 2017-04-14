@@ -12,15 +12,17 @@ environment:
   # Note the python version here referes to the one included in the installer
   # not the one used for building/packaging
   matrix:
-    - PYTHON_VERSION: 3.5.3
+    - PYTHON_VERSION: 3.6.1
       PLATTAG: win_amd64
+      ENVSPEC: scripts/windows/specs/PY35-win_amd64.txt
 
-      PYTHON: C:\Python35-x64
+      PYTHON: C:\Python36-x64
       # https://github.com/numpy/numpy/issues/7607
       BUILD_OPTIONS: build -j1
 
     - PYTHON_VERSION: 3.4.4
       PLATTAG: win32
+      ENVSPEC: scripts/windows/specs/PY34-win32.txt
 
       PYTHON: C:\Python34
 
@@ -33,7 +35,7 @@ cache:
 build_script:
   # assuming pyminor never goes over 9
   - set PYTAG=%PYTHON_VERSION:~0,1%%PYTHON_VERSION:~2,1%
-  - set SPECARGS=--python-version %PYTHON_VERSION% --platform %PLATTAG%
+  - set SPECARGS=--python-version %PYTHON_VERSION% --platform %PLATTAG% --pip-arg=-r --pip-arg=%ENVSPEC%
   - echo PYTAG    = %PYTAG%
   - echo SPECARGS = %SPECARGS%
   - git clone -q --depth 20 %REPO%
@@ -44,7 +46,7 @@ build_script:
   # Store/restore path around the build to not affect the tests later
   - set PATH_BEFORE_BUILD=%PATH%
   - set PATH=%PYTHON%;%PYTHON%\Scripts;%PATH%
-
+  - 'python -c "import sys; assert not sys.version_info[:3] == (3, 6, 1)"'
   - if not "%APPVEYOR_REPO_TAG%" == "" ( %PYTHON%\python -m pip install %BUILD_DEPS% )
   - if not "%APPVEYOR_REPO_TAG%" == "" ( %PYTHON%\python setup.py %BUILD_OPTIONS% bdist_wheel -d ../wheels )
   - if not "%APPVEYOR_REPO_TAG%" == "" ( for /f %%s in ( '%PYTHON%\python setup.py --version' ) do ( set VERSION=%%s ) )
