@@ -9,6 +9,9 @@ environment:
     # fixes build env dependencies for building orange3 wheels
     BUILD_DEPS: --only-binary numpy --extra-index-url=https://pypi.anaconda.org/ales-erjavec/simple numpy==1.9.3 wheel
 
+    # Orange version (released on PyPI)
+    VERSION: 3.4.2
+
   # Note the python version here referes to the one included in the installer
   # not the one used for building/packaging
   matrix:
@@ -22,7 +25,7 @@ matrix:
   fast_finish: true
 
 cache:
-  - '%LOCALAPPDATA%\pip\Cache' -> appveyor.yml
+  - '%LOCALAPPDATA%\pip\Cache -> appveyor.yml'
 
 build_script:
   # assuming pyminor never goes over 9
@@ -42,11 +45,11 @@ build_script:
   - 'python -c "import sys; assert not sys.version_info[:3] == (3, 6, 1)"'
   - python --version
   - python -m pip --version
-  - python -m pip install %BUILD_DEPS%
-  - python setup.py %BUILD_OPTIONS% bdist_wheel -d ../wheels
-  - for /f %%s in ( 'python setup.py --version' ) do ( set VERSION=%%s )
+  # - python -m pip install %BUILD_DEPS%
+  # - python setup.py %BUILD_OPTIONS% bdist_wheel -d ../wheels
+  # - for /f %%s in ( 'python setup.py --version' ) do ( set VERSION=%%s )
   # Strip newline from the end (.TrimEnd() does not work ????)
-  - ps: $Env:VERSION = ( ( $Env:VERSION + " " ).trim() )
+  #- ps: $Env:VERSION = ( ( $Env:VERSION + " " ).trim() )
   - echo VERSION  = %VERSION%
   # add msys2 and NSIS to path
   - set PATH=C:\msys64\usr\bin;C:\Program Files (x86)\NSIS;%PATH%
