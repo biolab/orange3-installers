@@ -22,7 +22,7 @@ matrix:
   fast_finish: true
 
 cache:
-  - '%LOCALAPPDATA%\pip\Cache' -> appveyor.yml
+  - '%LOCALAPPDATA%\pip\Cache -> appveyor.yml'
 
 build_script:
   # assuming pyminor never goes over 9
