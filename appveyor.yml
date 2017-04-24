@@ -9,7 +9,7 @@ environment:
     # fixes build env dependencies for building orange3 wheels
     BUILD_DEPS: --only-binary numpy --extra-index-url=https://pypi.anaconda.org/ales-erjavec/simple numpy==1.9.3 wheel
 
-  # Note the python version here referes to the one included in the installer
+  # Note the python version here refers to the one included in the installer
   # not the one used for building/packaging
   matrix:
     - PYTHON_VERSION: 3.4.4
@@ -29,32 +29,10 @@ build_script:
   - cd orange3
   - git fetch origin %BUILD_BRANCH%
   - git checkout %BUILD_COMMIT%
-  # assuming pyminor never goes over 9
-  - set PYTAG=%PYTHON_VERSION:~0,1%%PYTHON_VERSION:~2,1%
-  - set SPECARGS=--python-version %PYTHON_VERSION% --platform %PLATTAG% --pip-arg=-r --pip-arg=%ENVSPEC%
-  - echo PYTAG    = %PYTAG%
-  - echo SPECARGS = %SPECARGS%
-  # Store/restore path around the build to not affect the tests later
-  - set PATH_BEFORE_BUILD=%PATH%
-  - set PATH=%PYTHON%;%PYTHON%\Scripts;%PATH%
-  # https://bugs.python.org/issue29943
-  - 'python -c "import sys; assert not sys.version_info[:3] == (3, 6, 1)"'
-  - python --version
-  - python -m pip --version
-  - python -m pip install %BUILD_DEPS%
-  - python setup.py %BUILD_OPTIONS% bdist_wheel -d ../wheels
-  - for /f %%s in ( 'python setup.py --version' ) do ( set "VERSION=%%s" )
-  - echo VERSION  = %VERSION%
-  # add msys2 and NSIS to path
-  - set PATH=C:\msys64\usr\bin;C:\Program Files (x86)\NSIS;%PATH%
-  - bash -c "pacman -S --noconfirm unzip"
-  - bash -c "which unzip"
-  - bash -e scripts/windows/build-win-installer.sh --find-links=../wheels --pip-arg=orange3==%VERSION% %SPECARGS%
-  - cd ..
-  - set INSTALLER=Orange3-%VERSION%-Python%PYTAG%-%PLATTAG%.exe
 
-  # restore original path
-  - set PATH=%PATH_BEFORE_BUILD%
+  - ..\ci\appveyor-build.bat
+
+  - cd ..
 
 test_script:
   # Install in silent mode. Output has to be piped somewhere so the installer
