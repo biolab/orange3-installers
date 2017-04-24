@@ -25,16 +25,15 @@ cache:
   - '%LOCALAPPDATA%\pip\Cache -> appveyor.yml'
 
 build_script:
+  - git clone -q --depth 20 %REPO%
+  - cd orange3
+  - git fetch origin %BUILD_BRANCH%
+  - git checkout %BUILD_COMMIT%
   # assuming pyminor never goes over 9
   - set PYTAG=%PYTHON_VERSION:~0,1%%PYTHON_VERSION:~2,1%
   - set SPECARGS=--python-version %PYTHON_VERSION% --platform %PLATTAG% --pip-arg=-r --pip-arg=%ENVSPEC%
   - echo PYTAG    = %PYTAG%
   - echo SPECARGS = %SPECARGS%
-  - git clone -q --depth 20 %REPO%
-  - cd orange3
-  - git fetch origin %BUILD_BRANCH%
-  - git checkout %BUILD_COMMIT%
-
   # Store/restore path around the build to not affect the tests later
   - set PATH_BEFORE_BUILD=%PATH%
   - set PATH=%PYTHON%;%PYTHON%\Scripts;%PATH%
@@ -44,9 +43,7 @@ build_script:
   - python -m pip --version
   - python -m pip install %BUILD_DEPS%
   - python setup.py %BUILD_OPTIONS% bdist_wheel -d ../wheels
-  - for /f %%s in ( 'python setup.py --version' ) do ( set VERSION=%%s )
-  # Strip newline from the end (.TrimEnd() does not work ????)
-  - ps: $Env:VERSION = ( ( $Env:VERSION + " " ).trim() )
+  - for /f %%s in ( 'python setup.py --version' ) do ( set "VERSION=%%s" )
   - echo VERSION  = %VERSION%
   # add msys2 and NSIS to path
   - set PATH=C:\msys64\usr\bin;C:\Program Files (x86)\NSIS;%PATH%
