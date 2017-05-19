@@ -48,6 +48,7 @@ script:
   - ~/Applications/Orange3.app/Contents/MacOS/python -m unittest Orange.tests Orange.widgets.tests
 
 after_success:
+  - shasum -a 256 orange3/dist/Orange3-*.dmg
   - if [ ! $TRAVIS_TAG ]; then curl -fS --upload-file orange3/dist/Orange3-*.dmg https://transfer.sh/; fi
 
 deploy:

@@ -74,6 +74,10 @@ test_script:
   - mkdir installers
   - move orange3\dist\%INSTALLER% installers\
 
+  - set PATH=C:\msys64\usr\bin;%PATH%
+  - bash -c "sha256sum -b installers/*.exe"
+
+
 artifacts:
   - path: installers\*
 
