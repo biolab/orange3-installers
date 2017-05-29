@@ -1,5 +1,6 @@
 environment:
   global:
+    # git repo from which to pull orange3 sources
     REPO: https://github.com/ales-erjavec/orange3.git
     # Branch/ref from which to pull
     BUILD_BRANCH: win-app-reboot
@@ -15,8 +16,11 @@ environment:
     - PYTHON_VERSION: 3.4.4
       PLATTAG: win32
       ENVSPEC: scripts/windows/specs/PY34-win32.txt
-
       PYTHON: C:\Python34
+
+    - PYTHON_VERSION: '3.6'
+      CONDA: C:\Miniconda36-x64\Scripts\conda
+      PYTHON: C:\Miniconda36-x64\python
 
 matrix:
   fast_finish: true
@@ -30,34 +34,56 @@ build_script:
   - git fetch origin %BUILD_BRANCH%
   - git checkout %BUILD_COMMIT%
 
-  - ..\ci\appveyor-build.bat
+  - set "PATH_BEFORE_BUILD=%PATH%"
+  - set "PATH=C:\msys64\usr\bin;C:\Program Files (x86)\NSIS;%PATH%"
 
+  - if not "%CONDA%" == "" ( ..\ci\appveyor-conda-build.bat )
+  - if "%CONDA%" == "" ( ..\ci\appveyor-build.bat )
+
+  - for %%s in ( dist/Orange3*.exe ) do ( set "INSTALLER=%%s" )
+  - echo INSTALLER = %INSTALLER%
+
+  - set "PATH=%PATH_BEFORE_BUILD%"
   - cd ..
 
 test_script:
+  # cleanup registry of anaconda reg keys
+  - reg delete HKEY_LOCAL_MACHINE\Software\Python\ContinuumAnalytics /f
+  - reg delete HKEY_CURRENT_USER\Software\Python\ContinuumAnalytics /f
+  - dir orange3\dist
   # Install in silent mode. Output has to be piped somewhere so the installer
   # runs 'attached' to the console.
-  - dir orange3\dist
-  - orange3\dist\%INSTALLER% /S /D=C:\test-install > null
-
-  - C:\test-install\Scripts\python --version
-  - C:\test-install\Scripts\pip --version
-  - C:\test-install\Scripts\pip freeze
-  - C:\test-install\Scripts\pip install --no-index --no-cache-dir orange3
+  - orange3\dist\%INSTALLER% /S /D=C:\test-install > nul
+  # The venv and conda envs create different install layouts.
+  - if "%CONDA%" == "" ( set "PYTHON=C:\test-install\Scripts\python" )
+  - if not "%CONDA%" == "" ( set "PYTHON=C:\test-install\python" )
+  - >-
+    "%PYTHON%" --version
+  - >-
+    "%PYTHON%" -m pip --version
+  - >-
+    "%PYTHON%" -m pip freeze
+  # Test that orange and all dependencies are installed in a consistent state
+  - >-
+    "%PYTHON%" -m pip install --no-index --no-cache-dir orange3
 
   # Run test suite in the installed environment.
   - set ORANGE_DEPRECATIONS_ERROR=1
   - set PYTHONWARNINGS=module
-  - C:\test-install\Scripts\python -m unittest Orange.tests Orange.widgets.tests
+  - >-
+    "%PYTHON%" -m unittest Orange.tests Orange.widgets.tests
   - mkdir installers
   - move orange3\dist\%INSTALLER% installers\
 
-  - set PATH=C:\msys64\usr\bin;%PATH%
-  - bash -c "sha256sum -b installers/*.exe"
+  # Log the filename and the sha checksum
+  - for /f %%s in ( 'sha256sum -b installers/%INSTALLER%' ) do ( set "CHECKSUM=%%s" )
+  - echo INSTALLER = %INSTALLER%
+  - echo SHA256    = %CHECKSUM%
 
 
 artifacts:
   - path: installers\*
+  - path: conda-pkgs\*
 
 deploy:
   description: ''
