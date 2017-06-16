@@ -5,6 +5,11 @@ if "%PYTHON_VERSION%" == "" (
     exit /b 1
 )
 
+if  "%PLATTAG%" == "" (
+    echo Missing PLATTAG variable >&2
+    exit /b 1
+)
+
 "%CONDA%" config --append channels conda-forge  || exit /b %ERRORLEVEL%
 "%CONDA%" install --yes conda-build=2.1.15      || exit /b %ERRORLEVEL%
 
@@ -28,22 +33,27 @@ for /f %%s in ( '"%PYTHON%" setup.py --version' ) do (
 
 echo VERSION = %VERSION%
 
-"%CONDA%" create -n env --yes --use-local python=%PYTHON_VERSION% ^
+"%CONDA%" create -n env --yes --use-local ^
+             python=%PYTHON_VERSION% ^
              keyring=9.0 ^
              numpy=1.12.* ^
-             scipy=0.18.* ^
+             scipy=0.19.* ^
              scikit-learn=0.18.* ^
-             Orange3=%VERSION%
+             bottleneck=1.2.* ^
+             Orange3=%VERSION% ^
+    || exit /b %ERRROLEVEL%
 
 "%CONDA%" list -n env --export --explicit --md5 > env-spec.txt
 
 type env-spec.txt
 
 bash -e scripts/windows/build-conda-installer.sh ^
+        --platform %PLATTAG% ^
         --cache-dir ../cache ^
         --dist-dir dist ^
         --env-spec ./env-spec.txt ^
-        --online no
+        --online no ^
+    || exit /b %ERRROLEVEL%
 
 
 for %%s in ( dist/Orange3-*Miniconda*.exe ) do (
