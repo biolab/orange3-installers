@@ -29,7 +29,11 @@ for /f %%s in ( '"%PYTHON%" setup.py --version' ) do (
 echo VERSION = %VERSION%
 
 "%CONDA%" create -n env --yes --use-local python=%PYTHON_VERSION% ^
-             Orange3=%VERSION% keyring=9.0
+             keyring=9.0 ^
+             numpy=1.12.* ^
+             scipy=0.18.* ^
+             scikit-learn=0.18.* ^
+             Orange3=%VERSION%
 
 "%CONDA%" list -n env --export --explicit --md5 > env-spec.txt
 
