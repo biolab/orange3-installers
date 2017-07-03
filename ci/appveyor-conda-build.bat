@@ -6,7 +6,7 @@ if "%PYTHON_VERSION%" == "" (
 )
 
 "%CONDA%" config --append channels conda-forge  || exit /b %ERRORLEVEL%
-"%CONDA%" install --yes conda-build             || exit /b %ERRORLEVEL%
+"%CONDA%" install --yes conda-build=2.1.15      || exit /b %ERRORLEVEL%
 
 "%CONDA%" build --python %PYTHON_VERSION% ./conda-recipe || exit /b %ERRROLEVEL%
 
