@@ -33,7 +33,7 @@ for /f %%s in ( '"%PYTHON%" setup.py --version' ) do (
 
 echo VERSION = %VERSION%
 
-"%CONDA%" create -n env --yes --use-local ^
+"%CONDA%" create -n env --yes ^
              python=%PYTHON_VERSION% ^
              keyring=9.0 ^
              numpy=1.12.* ^
