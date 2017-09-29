@@ -13,8 +13,13 @@ environment:
     # Uncomment this when building release versions.
     #BUILD_LOCAL: 1
 
+    PIP_DISABLE_PIP_VERSION_CHECK: 1
+    # disable threaded builds on Python 3.5+ when using numpy's distutils
+    # (https://github.com/numpy/numpy/issues/7607)
+    BUILD_GLOBAL_OPTIONS: build -j1
+
     # fixes build env dependencies for building orange3 wheels
-    BUILD_DEPS: --only-binary numpy --extra-index-url=https://pypi.anaconda.org/ales-erjavec/simple numpy==1.9.3 wheel
+    BUILD_DEPS: --find-links https://orange.biolab.si/download/files/wheelhouse/ --only-binary numpy wheel==0.29.0 pip==9.0.1 numpy==1.9.3
 
   # Note the python version here refers to the one included in the installer
   # not the one used for building/packaging
@@ -23,6 +28,19 @@ environment:
       PLATTAG: win32
       ENVSPEC: scripts/windows/specs/PY34-win32.txt
       PYTHON: C:\Python34
+      BUILD_GLOBAL_OPTIONS: ""
+
+    # This installer does not work, fails to find the correct python
+    # (confuses 64-bit for 32-bit;)
+#    - PYTHON_VERSION: 3.6.3
+#      PLATTAG: win32
+#      ENVSPEC: ../specs/win/PY36.txt
+#      PYTHON: C:\Python36
+
+    - PYTHON_VERSION: 3.6.3
+      PLATTAG: win_amd64
+      ENVSPEC: ../specs/win/PY36.txt
+      PYTHON: C:\Python36-x64
 
     - PYTHON_VERSION: "3.5"
       PLATTAG: win32
@@ -79,7 +97,7 @@ test_script:
   - >-
     "%PYTHON%" -m pip --version
   - >-
-    "%PYTHON%" -m pip freeze
+    "%PYTHON%" -m pip list --format=freeze
   # Test that orange and all dependencies are installed in a consistent state
   # #- >-
   # #  "%PYTHON%" -m pip install --no-index --no-cache-dir orange3
@@ -101,13 +119,3 @@ test_script:
 artifacts:
   - path: installers\*
   - path: conda-pkgs\*
-
-deploy:
-  description: ''
-  provider: GitHub
-  auth_token:
-    secure: Nxnsu1AhdU0JXv7T18xJ9mWnLNe6/M1NND+tV6IYU8pdPs97hGbNaprSv2T24/N2
-  artifact: installers\*.exe
-  draft: True
-  on:
-    appveyor_repo_tag: true        # deploy on tag push only

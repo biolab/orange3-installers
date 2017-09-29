@@ -32,7 +32,7 @@ if "%BUILD_LOCAL%" == "" (
     if not "%BUILD_DEPS%" == "" (
         python -m pip install %BUILD_DEPS%   || exit /b !ERRORLEVEL!
     )
-    python setup.py %BUILD_OPTIONS% bdist_wheel -d ../wheels  ^
+    python setup.py %BUILD_GLOBAL_OPTIONS% bdist_wheel -d ../wheels  ^
         || exit /b !ERRORLEVEL!
 
     for /f %%s in ( 'python setup.py --version' ) do (
