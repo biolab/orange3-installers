@@ -5,13 +5,13 @@ environment:
     # Branch/ref from which to pull
     BUILD_BRANCH: master
     # Commit ref/tag to checkout
-    BUILD_COMMIT: FETCH_HEAD
+    BUILD_COMMIT: 3.6.0
 
     # Build the package locally or use the build packages from
     # conda-forge / PyPI. The BUILD_COMMIT must match the package version
     # to build.
     # Uncomment this when building release versions.
-    #BUILD_LOCAL: 1
+    BUILD_LOCAL: 1
 
     # fixes build env dependencies for building orange3 wheels
     BUILD_DEPS: --only-binary numpy --extra-index-url=https://pypi.anaconda.org/ales-erjavec/simple numpy==1.9.3 wheel
@@ -19,10 +19,10 @@ environment:
   # Note the python version here refers to the one included in the installer
   # not the one used for building/packaging
   matrix:
-    - PYTHON_VERSION: 3.4.4
-      PLATTAG: win32
-      ENVSPEC: scripts/windows/specs/PY34-win32.txt
-      PYTHON: C:\Python34
+#    - PYTHON_VERSION: 3.4.4
+#      PLATTAG: win32
+#      ENVSPEC: scripts/windows/specs/PY34-win32.txt
+#      PYTHON: C:\Python34
 
     - PYTHON_VERSION: '3.6'
       PLATTAG: win_amd64
