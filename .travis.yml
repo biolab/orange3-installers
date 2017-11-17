@@ -6,7 +6,7 @@ env:
     # Branch (or any remote ref, i.e. pull/10/head) to fetch
     - BUILD_BRANCH=master
     # Commit tag/ref to checkout
-    - BUILD_COMMIT=HEAD
+    - BUILD_COMMIT=3.7.1
 
 cache:
   ccache: true
@@ -16,7 +16,7 @@ cache:
     - ~/.cache/pkgs
 
 before_install:
-  - git clone -q --depth 20 https://github.com/biolab/orange3.git
+  - git clone https://github.com/biolab/orange3.git
   - cd orange3
   - git fetch origin $BUILD_BRANCH
   - git checkout $BUILD_COMMIT
