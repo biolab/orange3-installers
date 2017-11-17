@@ -24,6 +24,11 @@ environment:
       ENVSPEC: scripts/windows/specs/PY34-win32.txt
       PYTHON: C:\Python34
 
+    - PYTHON_VERSION: "3.5"
+      PLATTAG: win32
+      CONDA: C:\Miniconda36\Scripts\conda
+      PYTHON: C:\Miniconda36\python
+
     - PYTHON_VERSION: '3.6'
       PLATTAG: win_amd64
       CONDA: C:\Miniconda36-x64\Scripts\conda
