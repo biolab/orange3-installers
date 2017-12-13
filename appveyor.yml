@@ -30,12 +30,10 @@ environment:
       PYTHON: C:\Python34
       BUILD_GLOBAL_OPTIONS: ""
 
-    # This installer does not work, fails to find the correct python
-    # (confuses 64-bit for 32-bit;)
-#    - PYTHON_VERSION: 3.6.3
-#      PLATTAG: win32
-#      ENVSPEC: ../specs/win/PY36.txt
-#      PYTHON: C:\Python36
+    - PYTHON_VERSION: 3.6.3
+      PLATTAG: win32
+      ENVSPEC: ../specs/win/PY36.txt
+      PYTHON: C:\Python36
 
     - PYTHON_VERSION: 3.6.3
       PLATTAG: win_amd64
