@@ -3,7 +3,7 @@ environment:
     # git repo from which to pull orange3 sources
     REPO: https://github.com/biolab/orange3.git
     # Branch/ref from which to pull
-    BUILD_BRANCH: master
+    BUILD_BRANCH: pull/2952/head
     # Commit ref/tag to checkout
     BUILD_COMMIT: FETCH_HEAD
 
