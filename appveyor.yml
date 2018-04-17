@@ -24,11 +24,11 @@ environment:
   # Note the python version here refers to the one included in the installer
   # not the one used for building/packaging
   matrix:
-    #- PYTHON_VERSION: 3.4.4
-    #  PLATTAG: win32
-    #  ENVSPEC: scripts/windows/specs/PY34-win32.txt
-    #  PYTHON: C:\Python34
-    #  BUILD_GLOBAL_OPTIONS: ""
+    - PYTHON_VERSION: 3.4.4
+      PLATTAG: win32
+      ENVSPEC: scripts/windows/specs/PY34-win32.txt
+      PYTHON: C:\Python34
+      BUILD_GLOBAL_OPTIONS: ""
 
     - PYTHON_VERSION: 3.6.3
       PLATTAG: win32
@@ -104,7 +104,7 @@ test_script:
   - set ORANGE_DEPRECATIONS_ERROR=1
   - set PYTHONWARNINGS=module
   - >-
-    "%PYTHON%" -m unittest Orange.tests Orange.widgets.tests
+    "%PYTHON%" -m unittest Orange.tests
   - mkdir installers
   - move orange3\dist\%INSTALLER% installers\
 
