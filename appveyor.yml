@@ -104,7 +104,7 @@ test_script:
   - set ORANGE_DEPRECATIONS_ERROR=1
   - set PYTHONWARNINGS=module
   - >-
-    "%PYTHON%" -m unittest Orange.tests Orange.widgets.tests
+    "%PYTHON%" -m unittest Orange.tests
   - mkdir installers
   - move orange3\dist\%INSTALLER% installers\
 
