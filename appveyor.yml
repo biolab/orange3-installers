@@ -10,8 +10,8 @@ environment:
     # Build the package locally or use the build packages from
     # conda-forge / PyPI. The BUILD_COMMIT must match the package version
     # to build.
-    # Uncomment this when building release versions.
-    BUILD_LOCAL: false
+    # Comment/override this if building release versions.
+    BUILD_LOCAL: 1
 
     PIP_DISABLE_PIP_VERSION_CHECK: 1
     # disable threaded builds on Python 3.5+ when using numpy's distutils
@@ -45,15 +45,16 @@ environment:
 #      CONDA: C:\Miniconda36\Scripts\conda
 #      PYTHON: C:\Miniconda36\python
 
-    - PYTHON_VERSION: '3.6'
-      PLATTAG: win_amd64
-      CONDA: C:\Miniconda36-x64\Scripts\conda
-      PYTHON: C:\Miniconda36-x64\python
-
 #    - PYTHON_VERSION: '3.6'
-#      PLATTAG: win32
-#      CONDA: C:\Miniconda36\Scripts\conda
-#      PYTHON: C:\Miniconda36\python
+#      PLATTAG: win_amd64
+#      CONDA: C:\Miniconda36-x64\Scripts\conda
+#      PYTHON: C:\Miniconda36-x64\python
+
+    - PYTHON_VERSION: '3.6'
+      PLATTAG: win32
+      CONDA: C:\Miniconda36\Scripts\conda
+      PYTHON: C:\Miniconda36\python
+      BUILD_LOCAL: 1
 
 matrix:
   fast_finish: true
