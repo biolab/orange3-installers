@@ -21,17 +21,19 @@ rem Store/restore path around the build to not affect the tests later
 set PATH_BEFORE_BUILD=%PATH%
 set "PATH=%PYTHON%;%PYTHON%\Scripts;%PATH%"
 
-if "%BUILD_LOCAL%" == "" (
+python --version                     || exit /b !ERRORLEVEL!
+python -m pip --version              || exit /b !ERRORLEVEL!
+
+if not "%BUILD_DEPS%" == "" (
+    python -m pip install %BUILD_DEPS%   || exit /b !ERRORLEVEL!
+)
+python -m pip list --format=freeze
+
+if not "%BUILD_LOCAL%" == "" (
     rem # https://bugs.python.org/issue29943
     python -c "import sys; assert not sys.version_info[:3] == (3, 6, 1)" ^
         || exit /b !ERRORLEVEL!
 
-    python --version                     || exit /b !ERRORLEVEL!
-    python -m pip --version              || exit /b !ERRORLEVEL!
-
-    if not "%BUILD_DEPS%" == "" (
-        python -m pip install %BUILD_DEPS%   || exit /b !ERRORLEVEL!
-    )
     python setup.py %BUILD_GLOBAL_OPTIONS% bdist_wheel -d ../wheels  ^
         || exit /b !ERRORLEVEL!
 

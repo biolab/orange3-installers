@@ -3,8 +3,8 @@
 --find-links=https://orange.biolab.si/download/files/wheelhouse
 --only-binary numpy,scipy,bottleneck,scikit-learn,PyQt5
 
-numpy~=1.12.1
-scipy~=1.0.0
+numpy~=1.14.1
+scipy~=1.1.0
 scikit-learn~=0.19.1
 bottleneck~=1.2.0
 joblib==0.11

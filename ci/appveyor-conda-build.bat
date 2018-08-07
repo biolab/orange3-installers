@@ -13,9 +13,10 @@ if  "%PLATTAG%" == "" (
 
 "%CONDA%" config --append channels conda-forge  || exit /b !ERRORLEVEL!
 
-if "%BUILD_LOCAL%" == "" (
-    "%CONDA%" install --yes conda-build=2.1.15      || exit /b !ERRORLEVEL!
-    "%CONDA%" build --python %PYTHON_VERSION% ./conda-recipe || exit /b !ERRORLEVEL!
+if not "%BUILD_LOCAL%" == "" (
+    "%CONDA%" install --yes conda-build=3.12.1  || exit /b !ERRORLEVEL!
+    "%CONDA%" build --python %PYTHON_VERSION% --no-test ../specs/conda-recipe ^
+        || exit /b !ERRORLEVEL!
 
     rem # Copy the build conda pkg to artifacts dir
     rem # and the cache\conda-pkgs which is used later by build-conda-installer
@@ -25,7 +26,7 @@ if "%BUILD_LOCAL%" == "" (
     mkdir ..\cache             || exit /b !ERRORLEVEL!
     mkdir ..\cache\conda-pkgs  || exit /b !ERRORLEVEL!
 
-    for /f %%s in ( '"%CONDA%" build --output --python %PYTHON_VERSION% conda-recipe' ) do (
+    for /f %%s in ( '"%CONDA%" build --output --python %PYTHON_VERSION% ../specs/conda-recipe' ) do (
         copy /Y "%%s" ..\conda-pkgs\  || exit /b !ERRORLEVEL!
         copy /Y "%%s" ..\cache\conda-pkgs\  || exit /b !ERRORLEVEL!
     )
