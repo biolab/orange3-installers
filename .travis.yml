@@ -26,7 +26,7 @@ install:
   # TODO: If this is a tagged commit, then it would be preferable to use
   #       the (to be) published whl files (i.e. from the staging index so the
   #       wheels, installers, .. can go live at the same time)
-  - ./scripts/macos/build-macos-app.sh --pip-arg={-r,scripts/macos/requirements.txt,./} /Applications/Orange3.app
+  - ./scripts/macos/build-macos-app.sh --pip-arg={-r,../specs/macos/requirements.txt,./} /Applications/Orange3.app
   - ./scripts/macos/create-dmg-installer.sh --app /Applications/Orange3.app dist/Orange3.dmg
   #  reversed("LMAY KCUF")
   - "VERSION=$(/Applications/Orange3.app/Contents/MacOS/pip show orange3 | grep -E '^Version: ' | cut -d ' ' -f 2)"
