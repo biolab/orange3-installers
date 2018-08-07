@@ -1,0 +1,97 @@
+ignore: {% set data = load_setup_py_data() %}
+ignore: {% set version = data['version'] %}
+
+package:
+  name: orange3
+  version: {{ data['version'] }}
+
+source:
+  git_url: ../../orange3
+
+build:
+  number: 0
+  entry_points:
+    - orange-canvas = Orange.canvas.__main__:main
+
+  osx_is_app: True
+
+  script:
+    - python setup.py build -j1 bdist_wheel
+    - if errorlevel 1 exit 1        # [win]
+    - pip install --no-deps --no-cache --no-index -f dist Orange3=={{ version }}
+    - if errorlevel 1 exit 1        # [win]
+
+requirements:
+  build:
+    - {{ compiler('c') }}
+    - {{ compiler('cxx') }}
+  host:
+    - python
+    - setuptools
+    - numpy
+    - pip
+    - wheel
+  run:
+    - python
+    - setuptools
+    - numpy         >=1.9.0
+    - scipy
+    - scikit-learn  >=0.18
+    - bottleneck    >=1.0.0
+    - chardet       >=2.3.0
+    - docutils
+    - xlrd          >=0.9.2
+    - keyring
+    - keyrings.alt  # for alternative keyring implementations
+    - pyqt
+    - pyqtgraph
+    - anyqt         >=0.0.6
+    - joblib
+    - python.app    # [osx]
+    - commonmark
+    - serverfiles
+    - python-louvain
+
+test:
+  # Python imports
+  imports:
+    - Orange
+    - Orange.canvas
+    - Orange.canvas.application
+    - Orange.canvas.canvas
+    - Orange.canvas.canvas.items
+    - Orange.canvas.document
+    - Orange.canvas.gui
+    - Orange.canvas.help
+    - Orange.canvas.preview
+    - Orange.canvas.registry
+    - Orange.canvas.scheme
+    - Orange.canvas.styles
+    - Orange.canvas.utils
+
+    - Orange.widgets
+    - Orange.widgets.data
+    - Orange.widgets.evaluate
+    - Orange.widgets.model
+    - Orange.widgets.unsupervised
+    - Orange.widgets.visualize
+
+    - Orange.classification
+    - Orange.clustering
+    - Orange.data
+    - Orange.distance
+    - Orange.evaluation
+    - Orange.modelling
+    - Orange.preprocess
+    - Orange.projection
+    - Orange.regression
+    - Orange.statistics
+
+  commands:
+#    - python -m unittest -v Orange.tests
+    - orange-canvas --help
+
+about:
+  home: http://orange.biolab.si/
+  license: GNU General Public License v3 or later (GPLv3+)
+  summary: 'Orange, a component-based data mining framework.'
