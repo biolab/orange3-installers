@@ -11,7 +11,7 @@ environment:
     # conda-forge / PyPI. The BUILD_COMMIT must match the package version
     # to build.
     # Comment/override this if building release versions.
-    #BUILD_LOCAL: 1
+    BUILD_LOCAL: 1
 
     PIP_DISABLE_PIP_VERSION_CHECK: 1
     # disable threaded builds on Python 3.5+ when using numpy's distutils
