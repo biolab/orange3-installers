@@ -3,10 +3,12 @@ os: osx
 
 env:
   global:
+    # Git repo from which the sources are pulled
+    - REPO=https://github.com/ales-erjavec/orange3.git
     # Branch (or any remote ref, i.e. pull/10/head) to fetch
-    - BUILD_BRANCH=master
+    - BUILD_BRANCH=macos-signing
     # Commit tag/ref to checkout
-    - BUILD_COMMIT=HEAD
+    - BUILD_COMMIT=FETCH_HEAD
 
 cache:
   ccache: true
@@ -16,7 +18,7 @@ cache:
     - ~/.cache/pkgs
 
 before_install:
-  - git clone -q --depth 20 https://github.com/biolab/orange3.git
+  - git clone -q --depth 20 $REPO
   - cd orange3
   - git fetch origin $BUILD_BRANCH
   - git checkout $BUILD_COMMIT
