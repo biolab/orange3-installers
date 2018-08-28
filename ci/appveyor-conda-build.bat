@@ -47,6 +47,7 @@ echo VERSION = %VERSION%
              scipy=0.19.* ^
              scikit-learn=0.19.* ^
              bottleneck=1.2.* ^
+             pyqt=5.6.* ^
              Orange3=%VERSION% ^
     || exit /b !ERRORLEVEL!
 
