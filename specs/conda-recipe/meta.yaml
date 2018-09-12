@@ -51,6 +51,7 @@ requirements:
     - commonmark
     - serverfiles
     - python-louvain
+    - matplotlib    >=2.0.0
 
 test:
   # Python imports
