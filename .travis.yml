@@ -6,7 +6,7 @@ env:
     # Branch (or any remote ref, i.e. pull/10/head) to fetch
     - BUILD_BRANCH=master
     # Commit tag/ref to checkout
-    - BUILD_COMMIT=HEAD
+    - BUILD_COMMIT=3.16.0
 
 cache:
   ccache: true
