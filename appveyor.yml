@@ -1,9 +1,9 @@
 environment:
   global:
     # git repo from which to pull orange3 sources
-    REPO: https://github.com/biolab/orange3.git
+    REPO: https://github.com/ales-erjavec/orange3.git
     # Branch/ref from which to pull
-    BUILD_BRANCH: master
+    BUILD_BRANCH:  wip/fixes/condainstall.bat
     # Commit ref/tag to checkout
     BUILD_COMMIT: FETCH_HEAD
 
@@ -24,32 +24,32 @@ environment:
   # Note the python version here refers to the one included in the installer
   # not the one used for building/packaging
   matrix:
-    - PYTHON_VERSION: 3.6.5
-      PLATTAG: win32
-      ENVSPEC: ../specs/win/PY36.txt
-      PYTHON: C:\Python36
+#    - PYTHON_VERSION: 3.6.5
+#      PLATTAG: win32
+#      ENVSPEC: ../specs/win/PY36.txt
+#      PYTHON: C:\Python36
+#
+#    - PYTHON_VERSION: 3.6.5
+#      PLATTAG: win_amd64
+#      ENVSPEC: ../specs/win/PY36.txt
+#      PYTHON: C:\Python36-x64
 
-    - PYTHON_VERSION: 3.6.5
-      PLATTAG: win_amd64
-      ENVSPEC: ../specs/win/PY36.txt
-      PYTHON: C:\Python36-x64
-
-    - PYTHON_VERSION: "3.5"
-      PLATTAG: win32
-      CONDA: C:\Miniconda36\Scripts\conda
-      PYTHON: C:\Miniconda36\python
-      BUILD_LOCAL: 1
+#    - PYTHON_VERSION: "3.5"
+#      PLATTAG: win32
+#      CONDA: C:\Miniconda36\Scripts\conda
+#      PYTHON: C:\Miniconda36\python
+#      BUILD_LOCAL: 1
 
     - PYTHON_VERSION: '3.6'
       PLATTAG: win_amd64
       CONDA: C:\Miniconda36-x64\Scripts\conda
       PYTHON: C:\Miniconda36-x64\python
 
-    - PYTHON_VERSION: '3.6'
-      PLATTAG: win32
-      CONDA: C:\Miniconda36\Scripts\conda
-      PYTHON: C:\Miniconda36\python
-      BUILD_LOCAL: 1
+#    - PYTHON_VERSION: '3.6'
+#      PLATTAG: win32
+#      CONDA: C:\Miniconda36\Scripts\conda
+#      PYTHON: C:\Miniconda36\python
+#      BUILD_LOCAL: 1
 
 matrix:
   fast_finish: true

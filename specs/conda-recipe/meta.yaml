@@ -34,9 +34,9 @@ requirements:
   run:
     - python
     - setuptools
-    - numpy         >=1.9.0
+    - numpy         >=1.13.0
     - scipy
-    - scikit-learn  >=0.18
+    - scikit-learn  >=0.20
     - bottleneck    >=1.0.0
     - chardet       >=2.3.0
     - docutils
@@ -52,6 +52,7 @@ requirements:
     - serverfiles
     - python-louvain
     - matplotlib    >=2.0.0
+    - fastTSNE      >=0.2.12
 
 test:
   # Python imports
