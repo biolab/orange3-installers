@@ -57,6 +57,9 @@ matrix:
 cache:
   - '%LOCALAPPDATA%\pip\Cache -> appveyor.yml'
 
+init:
+  - ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+
 build_script:
   - git clone -q --depth 20 %REPO%
   - cd orange3
@@ -108,6 +111,9 @@ test_script:
   - for /f %%s in ( 'sha256sum -b installers/%INSTALLER%' ) do ( set "CHECKSUM=%%s" )
   - echo INSTALLER = %INSTALLER%
   - echo SHA256    = %CHECKSUM%
+
+on_finish:
+  - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
 
 
 artifacts:
