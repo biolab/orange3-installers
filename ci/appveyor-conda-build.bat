@@ -42,10 +42,9 @@ echo VERSION = %VERSION%
 
 "%CONDA%" create -n env --yes --use-local ^
              python=%PYTHON_VERSION% ^
-             keyring=9.0 ^
-             numpy=1.13.* ^
-             scipy=0.19.* ^
-             scikit-learn=0.19.* ^
+             numpy=1.14.* ^
+             scipy=1.0.* ^
+             scikit-learn=0.20.* ^
              bottleneck=1.2.* ^
              pyqt=5.6.* ^
              Orange3=%VERSION% ^
