@@ -29,6 +29,8 @@ if not "%BUILD_DEPS%" == "" (
 )
 python -m pip list --format=freeze
 
+python -m pip wheel --no-deps -w ../wheels fastTSNE
+
 if not "%BUILD_LOCAL%" == "" (
     rem # https://bugs.python.org/issue29943
     python -c "import sys; assert not sys.version_info[:3] == (3, 6, 1)" ^
