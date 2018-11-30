@@ -52,7 +52,7 @@ requirements:
     - serverfiles
     - python-louvain
     - matplotlib    >=2.0.0
-    - fasttsne
+    - fasttsne      >=0.2.12
 
 test:
   # Python imports
