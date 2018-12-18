@@ -49,4 +49,4 @@ script:
 
 after_success:
   - shasum -a 256 orange3/dist/Orange3-*.dmg
-  - curl -fS --upload-file orange3/dist/Orange3-*.dmg https://transfer.sh/
+  - echo $(curl -fS --upload-file orange3/dist/Orange3-*.dmg https://transfer.sh/)
