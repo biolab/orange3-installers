@@ -16,7 +16,7 @@ build:
   osx_is_app: True
 
   script:
-    - python setup.py build -j1 bdist_wheel
+    - python setup.py config --with-htmlhelp build -j1 bdist_wheel
     - if errorlevel 1 exit 1        # [win]
     - pip install --no-deps --no-cache --no-index -f dist Orange3=={{ version }}
     - if errorlevel 1 exit 1        # [win]
@@ -31,6 +31,7 @@ requirements:
     - numpy
     - pip
     - wheel
+    - sphinx
   run:
     - python
     - setuptools
@@ -92,6 +93,7 @@ test:
   commands:
 #    - python -m unittest -v Orange.tests
     - orange-canvas --help
+    - python -c "import pkg_resources as pr; pr.require('Orange3')"
 
 about:
   home: http://orange.biolab.si/
