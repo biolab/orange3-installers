@@ -54,6 +54,7 @@ requirements:
     - python-louvain
     - matplotlib    >=2.0.0
     - fasttsne      >=0.2.12
+    - xlsxwriter
 
 test:
   # Python imports
