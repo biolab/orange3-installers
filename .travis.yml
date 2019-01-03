@@ -57,7 +57,8 @@ script:
   # Don't even ask
   - export ORANGE_DEPRECATIONS_ERROR=1
   - export PYTHONWARNINGS=module
-  - $APP/Contents/MacOS/python -m unittest -v Orange.tests Orange.widgets.tests
+  - $APP/Contents/MacOS/python -Xfaulthandler -m unittest -v Orange.tests Orange.widgets.tests
+
 
 after_success:
   - shasum -a 256 orange3/dist/Orange3-*.dmg
