@@ -51,9 +51,9 @@ requirements:
     - python.app    # [osx]
     - commonmark
     - serverfiles
-    - python-louvain
+    - python-louvain >=0.13
     - matplotlib    >=2.0.0
-    - fasttsne      >=0.2.12
+    - fasttsne      ==0.2.13
     - xlsxwriter
 
 test:
