@@ -19,5 +19,5 @@ pyqtgraph==0.10.0
 six==1.10.0
 xlrd==1.0.0
 serverfiles
-fastTSNE>=0.2.13
+fastTSNE==0.2.13
 python-louvain>=0.13
