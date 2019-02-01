@@ -29,7 +29,7 @@ if not "%BUILD_DEPS%" == "" (
 )
 python -m pip list --format=freeze
 
-python -m pip wheel --no-deps -w ../wheels fastTSNE
+python -m pip wheel --no-deps -w ../wheels opentsne
 python -m pip wheel --no-deps -w ../wheels -f ../wheels -r "%ENVSPEC%"
 
 if not "%BUILD_LOCAL%" == "" (
