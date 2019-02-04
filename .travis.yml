@@ -57,7 +57,9 @@ script:
   # Don't even ask
   - export ORANGE_DEPRECATIONS_ERROR=1
   - export PYTHONWARNINGS=module
+  - unset TRAVIS
   - $APP/Contents/MacOS/python -Xfaulthandler -m unittest -v Orange.tests Orange.widgets.tests
+  - export TRAVIS=true
 
 
 after_success:
