@@ -40,25 +40,28 @@ if not "%BUILD_LOCAL%" == "" (
 
 echo VERSION = %VERSION%
 
-"%CONDA%" create -n env --yes --use-local ^
-             python=%PYTHON_VERSION% ^
-             numpy=1.14.* ^
-             scipy=1.1.* ^
-             scikit-learn=0.20.* ^
-             bottleneck=1.2.* ^
-             pyqt=5.6.* ^
-             Orange3=%VERSION% ^
-    || exit /b !ERRORLEVEL!
+if "%CONDA_SPEC_FILE%" == "" (
+    "%CONDA%" create -n env --yes --use-local ^
+                 python=%PYTHON_VERSION% ^
+                 numpy=1.14.* ^
+                 scipy=1.1.* ^
+                 scikit-learn=0.20.* ^
+                 bottleneck=1.2.* ^
+                 pyqt=5.6.* ^
+                 Orange3=%VERSION% ^
+        || exit /b !ERRORLEVEL!
 
-"%CONDA%" list -n env --export --explicit --md5 > env-spec.txt
+    "%CONDA%" list -n env --export --explicit --md5 > env-spec.txt
+    set CONDA_SPEC_FILE=env-spec.txt
+)
 
-type env-spec.txt
+type "%CONDA_SPEC_FILE%"
 
 bash -e scripts/windows/build-conda-installer.sh ^
         --platform %PLATTAG% ^
         --cache-dir ../cache ^
         --dist-dir dist ^
-        --env-spec ./env-spec.txt ^
+        --env-spec "%CONDA_SPEC_FILE%" ^
         --online no ^
     || exit /b !ERRORLEVEL!
 
