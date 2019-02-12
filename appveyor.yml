@@ -38,6 +38,7 @@ environment:
       PLATTAG: win_amd64
       CONDA: C:\Miniconda36-x64\Scripts\conda
       PYTHON: C:\Miniconda36-x64\python
+      BUILD_LOCAL: 1
 
 matrix:
   fast_finish: true
