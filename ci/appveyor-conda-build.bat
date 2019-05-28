@@ -43,9 +43,9 @@ echo VERSION = %VERSION%
 if "%CONDA_SPEC_FILE%" == "" (
     "%CONDA%" create -n env --yes --use-local ^
                  python=%PYTHON_VERSION% ^
-                 numpy=1.14.* ^
+                 numpy=1.16.* ^
                  scipy=1.2.* ^
-                 scikit-learn=0.20.* ^
+                 scikit-learn=0.21.* ^
                  bottleneck=1.2.* ^
                  pyqt=5.6.* ^
                  Orange3=%VERSION% ^
