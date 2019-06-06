@@ -32,11 +32,6 @@ environment:
       # CONDA_SPEC_FILE: ..\specs\win\conda-spec.txt
 
     - PYTHON_VERSION: 3.6.5
-      PLATTAG: win32
-      ENVSPEC: ../specs/win/PY36.txt
-      PYTHON: C:\Python36
-
-    - PYTHON_VERSION: 3.6.5
       PLATTAG: win_amd64
       ENVSPEC: ../specs/win/PY36.txt
       PYTHON: C:\Python36-x64
