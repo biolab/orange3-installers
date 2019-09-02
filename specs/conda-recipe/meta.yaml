@@ -1,5 +1,5 @@
-ignore: {% set data = load_setup_py_data() %}
-ignore: {% set version = data['version'] %}
+{% set data = load_setup_py_data() %}
+{% set version = data['version'] %}
 
 package:
   name: orange3
@@ -13,13 +13,7 @@ build:
   entry_points:
     - orange-canvas = Orange.canvas.__main__:main
 
-  osx_is_app: True
-
-  script:
-    - python setup.py config --with-htmlhelp build -j1 bdist_wheel
-    - if errorlevel 1 exit 1        # [win]
-    - pip install --no-deps --no-cache --no-index -f dist Orange3=={{ version }}
-    - if errorlevel 1 exit 1        # [win]
+  script: "python -m pip install . -vv"
 
 requirements:
   build:
@@ -55,23 +49,15 @@ requirements:
     - matplotlib    >=2.0.0
     - opentsne      >=0.3.0
     - pandas
+    - orange-canvas-core
+    - orange-widget-base
+    - pyyaml
 
 test:
   # Python imports
   imports:
     - Orange
-    - Orange.canvas
-    - Orange.canvas.application
-    - Orange.canvas.canvas
-    - Orange.canvas.canvas.items
-    - Orange.canvas.document
-    - Orange.canvas.gui
-    - Orange.canvas.help
-    - Orange.canvas.preview
-    - Orange.canvas.registry
-    - Orange.canvas.scheme
-    - Orange.canvas.styles
-    - Orange.canvas.utils
+    - Orange.canvas.config
 
     - Orange.widgets
     - Orange.widgets.data
@@ -92,7 +78,6 @@ test:
     - Orange.statistics
 
   commands:
-#    - python -m unittest -v Orange.tests
     - orange-canvas --help
     - python -c "import pkg_resources as pr; pr.require('Orange3')"
 
