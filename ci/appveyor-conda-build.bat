@@ -11,7 +11,8 @@ if  "%PLATTAG%" == "" (
     exit /b 1
 )
 
-"%CONDA%" config --append channels conda-forge  || exit /b !ERRORLEVEL!
+"%CONDA%" config --append channels conda-forge || exit /b !ERRORLEVEL!
+"%CONDA%" config --append channels ales-erjavec || exit /b !ERRORLEVEL!
 
 if not "%BUILD_LOCAL%" == "" (
     "%CONDA%" install --yes conda-build=3.17.8  || exit /b !ERRORLEVEL!
