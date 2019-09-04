@@ -22,7 +22,7 @@ requirements:
   host:
     - python
     - setuptools
-    - numpy
+    - numpy         1.14.*
     - pip
     - wheel
     - sphinx
