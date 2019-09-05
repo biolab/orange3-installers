@@ -29,9 +29,6 @@ if not "%BUILD_DEPS%" == "" (
 )
 python -m pip list --format=freeze
 
-python -m pip wheel --no-deps -w ../wheels opentsne
-python -m pip wheel -w ../wheels -f ../wheels -r "%ENVSPEC%"
-
 if not "%BUILD_LOCAL%" == "" (
     rem # https://bugs.python.org/issue29943
     python -c "import sys; assert not sys.version_info[:3] == (3, 6, 1)" ^
@@ -46,6 +43,7 @@ if not "%BUILD_LOCAL%" == "" (
 ) else (
     set "VERSION=%BUILD_COMMIT%"
 )
+python -m pip wheel -w ../wheels -f ../wheels orange3==%VERSION% -r "%ENVSPEC%"
 
 echo VERSION  = "%VERSION%"
 
