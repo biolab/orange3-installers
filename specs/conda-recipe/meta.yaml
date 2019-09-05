@@ -29,7 +29,7 @@ requirements:
   run:
     - python
     - setuptools    >=36.3
-    - numpy         >=1.13.0
+    - numpy         >=1.16.0
     - scipy
     - scikit-learn  >=0.20.0
     - bottleneck    >=1.2.1
