@@ -21,7 +21,7 @@ cache:
     - ~/.cache/pkgs
 
 before_install:
-  - git clone -q --depth 20 https://github.com/biolab/orange3.git
+  - git clone -q https://github.com/biolab/orange3.git
   - cd orange3
   - git fetch origin $BUILD_BRANCH
   - git checkout $BUILD_COMMIT
