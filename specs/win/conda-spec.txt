@@ -80,4 +80,4 @@ https://conda.anaconda.org/conda-forge/noarch/orange-widget-base-4.0.1-py_0.tar.
 https://repo.anaconda.com/pkgs/main/win-64/scikit-learn-0.21.2-py36h6288b17_0.tar.bz2#344474303fb8e8d0d1ceb417d7a903bb
 https://conda.anaconda.org/conda-forge/noarch/pynndescent-0.3.0-py_0.tar.bz2#e2c19d0298a796708c78a1381e3083d7
 https://conda.anaconda.org/conda-forge/win-64/opentsne-0.3.11-py36hc8d92b1_0.tar.bz2#d917ddba007af83facc0a112f0aebbba
-https://conda.anaconda.org/conda-forge/win-64/orange3-3.23.0-py36h6538335_1.tar.bz2#5cbcd0b981f99a9843217719b1dd5623
+https://conda.anaconda.org/conda-forge/win-64/orange3-3.23.1-py36h6538335_0.tar.bz2#54ebc66c50a1c3da330110ee1b3d70e4
