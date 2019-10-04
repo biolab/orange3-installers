@@ -64,4 +64,4 @@ script:
 
 after_success:
   - shasum -a 256 orange3/dist/Orange3-$VERSION.dmg
-  - echo $(curl -fS -F"file=@orange3/dist/Orange3-$VERSION.dmg" https://0x0.st)
+  - echo $(curl -fS -F"file=@orange3/dist/Orange3-$VERSION.dmg" https://file.io)
