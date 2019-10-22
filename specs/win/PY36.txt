@@ -15,7 +15,8 @@ keyrings.alt==2.2
 pywin32-ctypes==0.0.1
 pyreadline==2.1
 AnyQt~=0.0.8
-PyQt5~=5.9.1
+PyQt5~=5.12.3
+pyqtwebengine~=5.12.1
 docutils==0.13.1
 pip~=19.0
 pyqtgraph==0.10.0
