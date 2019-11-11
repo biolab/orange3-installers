@@ -4,7 +4,7 @@ os: osx
 env:
   global:
     # Branch (or any remote ref, i.e. pull/10/head) to fetch
-    - BUILD_BRANCH=master
+    - BUILD_BRANCH=pull/4179/head
     # Commit tag/ref to checkout
     - BUILD_COMMIT=FETCH_HEAD
 
