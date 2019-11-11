@@ -47,7 +47,7 @@ if "%CONDA_SPEC_FILE%" == "" (
                  scipy=1.2.* ^
                  scikit-learn=0.21.* ^
                  bottleneck=1.2.* ^
-                 pyqt=5.9.* ^
+                 pyqt=5.12.* ^
                  Orange3=%VERSION% ^
         || exit /b !ERRORLEVEL!
 
