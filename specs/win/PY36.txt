@@ -7,7 +7,7 @@
 
 numpy~=1.16.0
 scipy~=1.2.0
-scikit-learn~=0.21.0
+scikit-learn~=0.22.0
 bottleneck~=1.2.0
 chardet~=3.0
 keyring==10.3.1
