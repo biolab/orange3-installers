@@ -1,0 +1,76 @@
+trigger:
+  branches:
+    include:
+      - master
+      - releases/*
+      - testing/azure/*
+
+variables:
+  REPO: https://github.com/biolab/orange3.git
+  BUILD_BRANCH: master
+  BUILD_COMMIT: FETCH_HEAD
+  BUILD_LOCAL: 1
+
+jobs:
+  - job: 'build_macos_dmg'
+    displayName: Build macOS installer
+    pool:
+      vmImage: macos-10.13
+
+    variables:
+      APP: "/Applications/Orange3.app"
+
+    steps:
+      - bash: |
+          set -e
+          git clone -q --depth 100 $REPO
+          cd orange3
+          git fetch origin $BUILD_BRANCH
+          git checkout $BUILD_COMMIT
+        displayName: 'Clone and checkout repo'
+
+      - task: UsePythonVersion@0
+        inputs:
+          versionSpec: '3.6'
+          architecture: 'x64'
+        displayName: 'Use Python 3.6'
+
+      - bash: |
+          set -e
+          cd orange3
+          if [[ $BUILD_LOCAL ]]; then
+              PIP_ARGS=( --pip-arg={-r,../specs/macos/requirements.txt,./} );
+          else
+              PIP_ARGS=( --pip-arg={-r,../specs/macos/requirements.txt,Orange3==$BUILD_COMMIT} );
+          fi
+          ./scripts/macos/build-macos-app.sh "${PIP_ARGS[@]}" --python-version=3.6.8 "$APP"
+        displayName: Build application bundle
+
+      - bash: |
+          set -e
+          cd orange3
+          ./scripts/macos/create-dmg-installer.sh --app "$APP" dist/Orange3.dmg
+          VERSION=$("$APP/Contents/MacOS/pip" show orange3 | grep -E '^Version: ' | cut -d ' ' -f 2)
+          mv dist/Orange3.dmg dist/Orange3-$VERSION.dmg
+          shasum -a 256 dist/Orange3-$VERSION.dmg
+        displayName: Build dmg installer
+
+      - bash: |
+          set -e
+          mkdir -p ~/Applications
+          mv -f $APP ~/Applications/
+          APP=( ~/Applications/Orange3.app )
+          $APP/Contents/MacOS/python --version
+          $APP/Contents/MacOS/pip --version
+          $APP/Contents/MacOS/pip freeze
+
+          export ORANGE_DEPRECATIONS_ERROR=1
+          export PYTHONWARNINGS=module
+          unset TRAVIS
+          $APP/Contents/MacOS/python -Xfaulthandler -m unittest -v Orange.tests Orange.widgets.tests
+        displayName: Run tests
+
+      - task: PublishBuildArtifacts@1
+        inputs:
+          pathtoPublish: orange3/dist
+          artifactName: 'dmg installer'
