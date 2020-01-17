@@ -70,7 +70,12 @@ jobs:
           $APP/Contents/MacOS/python -Xfaulthandler -m unittest -v Orange.tests Orange.widgets.tests
         displayName: Run tests
 
+      - task: CopyFiles@2
+        inputs:
+          contents: 'orange3/dist/*.dmg'
+          targetFolder: $(Build.ArtifactStagingDirectory)
+
       - task: PublishBuildArtifacts@1
         inputs:
-          pathtoPublish: orange3/dist
-          artifactName: 'dmg installer'
+          pathtoPublish: $(Build.ArtifactStagingDirectory)
+          artifactName: 'macOS dmg installer'
