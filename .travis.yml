@@ -38,7 +38,7 @@ install:
   - |-
     ./scripts/macos/build-macos-app.sh "${PIP_ARGS[@]}" --python-version=3.6.8 "$APP"
   - |-
-    ./scripts/macos/create-dmg-installer.sh --app "$APP" dist/Orange3.dmg
+    travis_wait ./scripts/macos/create-dmg-installer.sh --app "$APP" dist/Orange3.dmg
   - |-
     VERSION=$("$APP/Contents/MacOS/pip" show orange3 | grep -E '^Version: ' | cut -d ' ' -f 2)
   - mv dist/Orange3.dmg dist/Orange3-$VERSION.dmg
