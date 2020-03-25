@@ -13,6 +13,12 @@ env:
     # is the version tag)
     - BUILD_LOCAL=1
 
+matrix:
+  fast_finish: false
+  include:
+    - env: PYTHON_VERSION=3.6.8
+    - env: PYTHON_VERSION=3.7.6
+
 cache:
   ccache: true
   directories:
@@ -36,7 +42,7 @@ install:
         PIP_ARGS=( --pip-arg={-r,../specs/macos/requirements.txt,Orange3==$BUILD_COMMIT} );
     fi
   - |-
-    ../scripts/macos/build-macos-app.sh "${PIP_ARGS[@]}" --python-version=3.6.8 "$APP"
+    ../scripts/macos/build-macos-app.sh "${PIP_ARGS[@]}" --python-version=$PYTHON_VERSION "$APP"
   - |-
     ../scripts/macos/create-dmg-installer.sh --app "$APP" dist/Orange3.dmg
   - |-
