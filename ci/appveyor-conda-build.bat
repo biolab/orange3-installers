@@ -13,8 +13,12 @@ if  "%PLATTAG%" == "" (
 
 "%CONDA%" config --append channels conda-forge  || exit /b !ERRORLEVEL!
 
+if "%CONDA_BUILD_VERSION%" == "" (
+    set "CONDA_BUILD_VERSION=3.17.8"
+)
+
 if not "%BUILD_LOCAL%" == "" (
-    "%CONDA%" install --yes conda-build=3.17.8  || exit /b !ERRORLEVEL!
+    "%CONDA%" install --yes conda-build=%CONDA_BUILD_VERSION%  || exit /b !ERRORLEVEL!
     "%CONDA%" build --python %PYTHON_VERSION% ../specs/conda-recipe ^
         || exit /b !ERRORLEVEL!
 
