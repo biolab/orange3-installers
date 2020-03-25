@@ -31,6 +31,7 @@ environment:
       PLATTAG: win_amd64
       CONDA: C:\Miniconda37-x64\Scripts\conda
       PYTHON: C:\Miniconda37-x64\python
+      CONDA_BUILD_VERSION: '3.18.*'
       CONDA_SPEC_FILE:
       # CONDA_SPEC_FILE: ..\specs\win\conda-spec.txt
 
