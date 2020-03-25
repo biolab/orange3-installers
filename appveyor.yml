@@ -1,3 +1,5 @@
+image: Visual Studio 2019
+
 environment:
   global:
     # git repo from which to pull orange3 sources
@@ -75,8 +77,8 @@ build_script:
 
 test_script:
   # cleanup registry of anaconda reg keys
-  - reg delete HKEY_LOCAL_MACHINE\Software\Python\ContinuumAnalytics /f
-  - reg delete HKEY_CURRENT_USER\Software\Python\ContinuumAnalytics /f
+  - reg delete HKEY_LOCAL_MACHINE\Software\Python\ContinuumAnalytics /f || cd .
+  - reg delete HKEY_CURRENT_USER\Software\Python\ContinuumAnalytics /f || cd .
   - dir orange3\dist
   # Install in silent mode. Output has to be piped somewhere so the installer
   # runs 'attached' to the console.
