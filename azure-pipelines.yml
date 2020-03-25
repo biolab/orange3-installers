@@ -43,7 +43,7 @@ jobs:
           else
               PIP_ARGS=( --pip-arg={-r,../specs/macos/requirements.txt,Orange3==$BUILD_COMMIT} );
           fi
-          ../scripts/macos/build-macos-app.sh "${PIP_ARGS[@]}" --python-version=3.6.8 "$APP"
+          ../scripts/macos/build-macos-app.sh "${PIP_ARGS[@]}" --python-version=3.7.6 "$APP"
         displayName: Build application bundle
 
       - bash: |

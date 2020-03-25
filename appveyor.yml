@@ -25,17 +25,17 @@ environment:
   # Note the python version here refers to the one included in the installer
   # not the one used for building/packaging
   matrix:
-    - PYTHON_VERSION: '3.6'
+    - PYTHON_VERSION: '3.7.6'
       PLATTAG: win_amd64
-      CONDA: C:\Miniconda36-x64\Scripts\conda
-      PYTHON: C:\Miniconda36-x64\python
+      CONDA: C:\Miniconda37-x64\Scripts\conda
+      PYTHON: C:\Miniconda37-x64\python
       CONDA_SPEC_FILE:
       # CONDA_SPEC_FILE: ..\specs\win\conda-spec.txt
 
-    - PYTHON_VERSION: 3.6.5
+    - PYTHON_VERSION: '3.7.6'
       PLATTAG: win_amd64
       ENVSPEC: ../specs/win/PY36.txt
-      PYTHON: C:\Python36-x64
+      PYTHON: C:\Python37-x64
 
 matrix:
   fast_finish: false
