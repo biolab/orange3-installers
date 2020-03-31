@@ -55,6 +55,7 @@ build_script:
   - set "PATH_BEFORE_BUILD=%PATH%"
   - set "PATH=C:\msys64\usr\bin;C:\Program Files (x86)\NSIS;%PATH%"
 
+  - if not "%CONDA%" == "" ( rmdir /q /s "C:\Program Files (x86)\Windows Kits\10\include\wdf" )
   - if not "%CONDA%" == "" ( ..\ci\appveyor-conda-build.bat )
   - if "%CONDA%" == "" ( ..\ci\appveyor-build.bat )
 
