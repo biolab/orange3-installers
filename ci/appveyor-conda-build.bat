@@ -15,7 +15,7 @@ if  "%PLATTAG%" == "" (
 
 if not "%BUILD_LOCAL%" == "" (
     "%CONDA%" install --yes conda-build=3.17.8  || exit /b !ERRORLEVEL!
-    "%CONDA%" build --python %PYTHON_VERSION% --no-test ../specs/conda-recipe ^
+    "%CONDA%" build --python %PYTHON_VERSION% ../specs/conda-recipe ^
         || exit /b !ERRORLEVEL!
 
     rem # Copy the build conda pkg to artifacts dir
