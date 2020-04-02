@@ -25,3 +25,4 @@ xlsxwriter
 serverfiles
 opentsne~=0.3.0
 python-louvain>=0.13
+pandas~=0.25
