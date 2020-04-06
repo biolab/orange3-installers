@@ -52,7 +52,7 @@ set "PATH=C:\msys64\usr\bin;C:\Program Files (x86)\NSIS;%PATH%"
 rem ensure unzip is present in msys2
 bash -c "pacman -S --noconfirm unzip"  || exit /b %ERRORLEVEL%
 bash -c "which unzip"                  || exit /b %ERRORLEVEL%
-bash -e scripts/windows/build-win-installer.sh ^
+bash -e ../scripts/windows/build-win-installer.sh ^
      --find-links=../wheels ^
      --pip-arg=orange3==%VERSION%  ^
      %SPECARGS%        || exit /b %ERRORLEVEL%

@@ -57,7 +57,7 @@ if "%CONDA_SPEC_FILE%" == "" (
 
 type "%CONDA_SPEC_FILE%"
 
-bash -e scripts/windows/build-conda-installer.sh ^
+bash -e ../scripts/windows/build-conda-installer.sh ^
         --platform %PLATTAG% ^
         --cache-dir ../cache ^
         --dist-dir dist ^
