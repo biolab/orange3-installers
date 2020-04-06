@@ -15,7 +15,7 @@ jobs:
   - job: 'build_macos_dmg'
     displayName: Build macOS installer
     pool:
-      vmImage: macos-10.13
+      vmImage: macOS-10.14
 
     variables:
       APP: "/Applications/Orange3.app"
