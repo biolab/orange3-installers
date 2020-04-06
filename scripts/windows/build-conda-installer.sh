@@ -204,8 +204,10 @@ conda-fetch-packages() {
     echo "@EXPLICIT" >"${destdir}/conda-spec.txt"
     (
         cd "${destdir}"
+        # list out files by creation date to (sometimes) preserve order
+        # that was in specfile (should parse specfile instead)
         shopt -s nullglob
-        ls -1 *.tar.bz2 *.conda
+        ls -1tr *.tar.bz2 *.conda
     ) >> "${destdir}/conda-spec.txt"
 }
 
