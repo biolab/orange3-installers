@@ -56,6 +56,10 @@ requirements:
     - baycomp    >=1.0.2
     - httpx      =0.12.*
 
+    # cachecontrol 0.12.5 is incompatible with msgpack-python=1.0
+    - cachecontrol   >=0.12.6
+    - msgpack-python >=1.0
+
 test:
   # Python imports
   imports:
