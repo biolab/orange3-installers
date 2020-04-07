@@ -382,6 +382,11 @@ if [[ ! "${VERSION}" ]]; then
     exit 1
 fi
 
+if [[ ! "${PYTHON_VERSION}" ]]; then
+    echo "Cannot determine pyhton version from the environment spec" >&2
+    exit 1;
+fi
+
 cp "${CACHEDIR:?}/miniconda/Miniconda3-${MINICONDA_VERSION}-Windows-${CONDAPLATTAG}.exe" \
    "${BASEDIR:?}/"
 
