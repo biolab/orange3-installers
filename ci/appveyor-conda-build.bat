@@ -63,7 +63,7 @@ type "%CONDA_SPEC_FILE%"
 
 bash -e ../scripts/windows/build-conda-installer.sh ^
         --platform %PLATTAG% ^
-        --cache-dir ../cache ^
+        --cache-dir ../.cache ^
         --dist-dir dist ^
         --env-spec "%CONDA_SPEC_FILE%" ^
         --online no ^
