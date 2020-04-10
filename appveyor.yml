@@ -57,6 +57,7 @@ matrix:
 
 cache:
   - '%LOCALAPPDATA%\pip\Cache -> appveyor.yml'
+  - '.cache -> appveyor.yml'
 
 build_script:
   - git clone -q --depth 20 %REPO%
