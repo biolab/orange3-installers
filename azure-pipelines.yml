@@ -11,14 +11,20 @@ variables:
   BUILD_COMMIT: FETCH_HEAD
   BUILD_LOCAL: 1
 
+  APP: "/Applications/Orange3.app"
+
 jobs:
   - job: 'build_macos_dmg'
     displayName: Build macOS installer
     pool:
       vmImage: macOS-10.14
 
-    variables:
-      APP: "/Applications/Orange3.app"
+    strategy:
+      matrix:
+        PY36:
+          PYTHON_VERSION: 3.6.8
+        PY37:
+          PYTHON_VERSION: 3.7.6
 
     steps:
       - bash: |
@@ -43,7 +49,7 @@ jobs:
           else
               PIP_ARGS=( --pip-arg={-r,../specs/macos/requirements.txt,Orange3==$BUILD_COMMIT} );
           fi
-          ../scripts/macos/build-macos-app.sh "${PIP_ARGS[@]}" --python-version=3.7.6 "$APP"
+          ../scripts/macos/build-macos-app.sh "${PIP_ARGS[@]}" --python-version=${PYTHON_VERSION} "$APP"
         displayName: Build application bundle
 
       - bash: |
