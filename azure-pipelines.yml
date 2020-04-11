@@ -57,8 +57,8 @@ jobs:
           cd orange3
           ../scripts/macos/create-dmg-installer.sh --app "$APP" dist/Orange3.dmg
           VERSION=$("$APP/Contents/MacOS/pip" show orange3 | grep -E '^Version: ' | cut -d ' ' -f 2)
-          mv dist/Orange3.dmg dist/Orange3-$VERSION.dmg
-          shasum -a 256 dist/Orange3-$VERSION.dmg
+          mv dist/Orange3.dmg dist/Orange3-$VERSION-Python${PYTHON_VERSION}.dmg
+          shasum -a 256 dist/Orange3-$VERSION-Python${PYTHON_VERSION}.dmg
         displayName: Build dmg installer
 
       - bash: |
