@@ -216,7 +216,7 @@ Var StartMenuFolder
 
 # Temporary folder where temp data will be extracted
 # ($PLUGINSDIR is the (supposedly) recommend place for this; deleted on exit)
-!define TEMPDIR "$PLUGINSDIR\${APPNAME}-installer-data"
+!define TEMPDIR "$PLUGINSDIR\pkgs"
 
 !include "PythonHelpers.nsh"
 
@@ -495,7 +495,6 @@ Section "Install required packages" InstallPackages
             --prefix "$PythonPrefix" \
         '
 !else
-    # Run the install via from a helper script (informative output).
     DetailPrint "Installing packages (this might take a while)"
     ${ExecToLog} 'cmd.exe /c install.bat "$PythonPrefix" \
                   "$BasePythonPrefix\Scripts\conda.exe"'

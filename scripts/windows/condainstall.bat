@@ -14,6 +14,12 @@ if exist "%CONDA%\..\activate" (
     call "%CONDA%\..\activate"
 )
 
+rem Use a temporary package cache; try to avoid all modification in base
+rem conda prefix.
+
+mkdir "%CD%\p"
+set "CONDA_PKGS_DIRS=%CD%\p"
+
 if not exist "%PREFIX%\python.exe" (
     echo Creating a conda env in "%PREFIX%"
     rem # Create an empty initial skeleton to layout the conda, activate.bat
