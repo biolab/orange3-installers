@@ -98,12 +98,14 @@ test_script:
   # Test that orange and all dependencies are installed in a consistent state
   - >-
     "%PYTHON%" -m pip install --no-index --no-cache-dir orange3
+  - >-
+    "%PYTHON%" -m pip install git+https://github.com/ales-erjavec/orange-widget-base.git@pyqtgraph-disable-exit-cleanup
 
   # Run test suite in the installed environment.
   - set ORANGE_DEPRECATIONS_ERROR=1
   - set PYTHONWARNINGS=module
   - >-
-    "%PYTHON%" -m unittest -v Orange.tests Orange.widgets.tests || cd .
+    "%PYTHON%" -m unittest -v Orange.tests Orange.widgets.tests
   - mkdir installers
   - move orange3\dist\%INSTALLER% installers\
 
