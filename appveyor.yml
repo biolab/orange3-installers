@@ -32,6 +32,7 @@ environment:
       CONDA: C:\Miniconda37-x64\Scripts\conda
       PYTHON: C:\Miniconda37-x64\python
       CONDA_BUILD_VERSION: '3.18.*'
+      CONDA_USE_ONLY_TAR_BZ2: "1"
       CONDA_SPEC_FILE:
       # CONDA_SPEC_FILE: ..\specs\win\conda-spec.txt
 
