@@ -56,7 +56,7 @@ build_script:
 
   - set "PATH_BEFORE_BUILD=%PATH%"
   - set "PATH=C:\msys64\usr\bin;C:\Program Files (x86)\NSIS;%PATH%"
-
+  - pacman -S --noconfirm zip unzip
   - if not "%CONDA%" == "" ( rmdir /q /s "C:\Program Files (x86)\Windows Kits\10\include\wdf" )
   - if not "%CONDA%" == "" ( ..\ci\appveyor-conda-build.bat )
   - if "%CONDA%" == "" ( ..\ci\appveyor-build.bat )
@@ -68,6 +68,7 @@ build_script:
   - cd ..
 
 test_script:
+  - mkdir installers
   # cleanup registry of anaconda reg keys
   - reg delete HKEY_LOCAL_MACHINE\Software\Python\ContinuumAnalytics /f || cd .
   - reg delete HKEY_CURRENT_USER\Software\Python\ContinuumAnalytics /f || cd .
@@ -78,6 +79,7 @@ test_script:
   # The venv and conda envs create different install layouts.
   - if "%CONDA%" == "" ( set "PYTHON=C:\test-install\Scripts\python" )
   - if not "%CONDA%" == "" ( set "PYTHON=C:\test-install\python" )
+  - if not "%CONDA%" == "" ( ci\appveyor-make-portable.bat C:\test-install %CD%\installers\Orange.zip )
   - >-
     "%PYTHON%" --version
   - >-
@@ -93,7 +95,6 @@ test_script:
   - set PYTHONWARNINGS=module
   - >-
     "%PYTHON%" -m unittest -v Orange.tests Orange.widgets.tests || cd .
-  - mkdir installers
   - move orange3\dist\%INSTALLER% installers\
 
   # Log the filename and the sha checksum
