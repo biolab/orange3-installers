@@ -39,7 +39,7 @@ requirements:
     - xlsxwriter
     - keyring
     - keyrings.alt  # for alternative keyring implementations
-    - pyqt
+    - pyqt          ~=5.12.0
     - pyqtgraph     >=0.10.0
     - anyqt         >=0.0.8
     - joblib        >=0.9.4
@@ -47,10 +47,10 @@ requirements:
     - serverfiles
     - python-louvain >=0.13
     - matplotlib    >=2.0.0
-    - opentsne      >=0.3.11
+    - opentsne      >=0.4.3
     - pandas
-    - orange-canvas-core >=0.1.9
-    - orange-widget-base >=4.5.0
+    - orange-canvas-core >=0.1.15
+    - orange-widget-base >=4.6.0
     - pyyaml
     - openpyxl
     - baycomp    >=1.0.2
