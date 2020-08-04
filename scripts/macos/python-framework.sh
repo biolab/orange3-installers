@@ -13,6 +13,9 @@ Options:
     --install-certifi     If present then certifi pypi package will be
                           installed and its cert store linked in
                           \${PREFIX}/etc/openssl
+    --recompile-main      Recompile the python main entry point in the included
+                          Python.app (needed to make use of more recent macos
+                          sdk, e.g. to use dark mode, ...)
     -v --verbose          Increase verbosity level
 
 Note:
@@ -269,6 +272,60 @@ install-certifi() {
     test -r "${prefix}"/etc/openssl/cert.pem
 }
 
+python-framework-recompile-main() {
+# Build a python 'main' executable with a newer sdk. Newer Qt builds need
+# to run in a proces build with at least 10.13 sdk
+    local fmkdir=${1:?}
+
+    shopt -s nullglob
+    local versions=( "${fmkdir}"/Versions/?.? )
+
+    if [[ ! ${#versions[*]} == 1 ]]; then
+        echo "Single version framework expected (found: ${versions[*]})"
+        return 2
+    fi
+    local ver_short=${versions##*/}
+    local prefix="${fmkdir}"/Versions/${ver_short}
+    local bindir="${prefix}"/bin
+    local libdir="${prefix}"/lib
+    local includedir=( "${prefix}"/include/python?.?* )
+    shopt -u nullglob
+
+#    cat <<'EOF' > main.c
+
+    CC=${CC:-clang}
+    ${CC} -mmacosx-version-min=${MACOSVER} \
+          -I "${includedir}" \
+          -L "${prefix}"/lib \
+          -lpython"${ver_short}" \
+          -rpath "@executable_path/../../../../../../../" \
+          -o "${fmkdir}"/Resources/Python.app/Contents/MacOS/Python \
+          -xc \
+          - <<'EOF'
+    #include <Python.h>
+
+    #if PY_VERSION_HEX < 0x03080000
+    wchar_t ** convert_args(int argc, char ** argv) {
+        int i = 0;
+        wchar_t ** args = malloc(sizeof(wchar_t *) * (argc + 1));
+        for (; i<argc; i++){
+          size_t len;
+          args[i] = Py_DecodeLocale(argv[i], &len);
+        }
+        args[i] = NULL;
+        return args;
+    }
+    #endif
+
+    int main(int argc, char ** argv) {
+    #if PY_VERSION_HEX < 0x03080000
+        return Py_Main(argc, convert_args(argc, argv));
+    #else
+        return Py_BytesMain(argc, argv);
+    #endif
+    }
+EOF
+}
 
 while [[ "${1:0:1}" == "-" ]]; do
     case "${1}" in
@@ -289,6 +346,9 @@ while [[ "${1:0:1}" == "-" ]]; do
             shift 1;;
         --install-certifi)
             INSTALL_CERTIFI=1
+            shift 1;;
+        --recompile-main)
+            RECOMPILE_MAIN=1
             shift 1;;
         --help|-h)
             usage; exit 0;;
@@ -312,7 +372,14 @@ python-framework-relocate "${1:?}"/Python.framework
     ln -shf ?.? ./Current  # assuming single version framework
 )
 
+PYTHONPREFIX="${1:?}"/Python.framework/Versions/Current
+
 if [[ ${INSTALL_CERTIFI} ]]; then
     verbose 1 "Installing and linking certifi pypi package"
-    install-certifi "${1:?}"/Python.framework/Versions/Current
+    install-certifi "${PYTHONPREFIX}"
+fi
+
+
+if [[ ${RECOMPILE_MAIN} ]]; then
+    python-framework-recompile-main "${1:?}"/Python.framework
 fi

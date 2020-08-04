@@ -87,6 +87,7 @@ cp -a "${DIR}"/skeleton.app/Contents/{Resources,Info.plist.in} \
     --version "${PYTHON_VERSION}" \
     --macos 10.9 \
     --install-certifi \
+    --recompile-main \
     "${APPDIR}"/Contents/Frameworks
 
 ln -fs ../Frameworks/Python.framework/Versions/${PYVER}/Resources/Python.app/Contents/MacOS/Python \
