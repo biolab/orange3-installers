@@ -55,6 +55,7 @@ requirements:
     - openpyxl
     - baycomp    >=1.0.2
     - httpx      =0.12.*
+    - qtconsole  =4.7.2
 
     # cachecontrol 0.12.5 is incompatible with msgpack-python=1.0
     - cachecontrol   >=0.12.6

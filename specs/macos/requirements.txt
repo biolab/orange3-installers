@@ -24,3 +24,4 @@ xlsxwriter
 serverfiles
 opentsne~=0.4.3
 python-louvain>=0.13
+qtconsole==4.7.2
