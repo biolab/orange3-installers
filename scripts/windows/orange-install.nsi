@@ -38,6 +38,8 @@
 
 #!include InstallConfig.nsh
 
+Unicode True
+
 !ifndef PYINSTALL_TYPE
     !error "PYINSTALL_TYPE must be defined"
 !endif
