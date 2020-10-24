@@ -13,7 +13,7 @@ joblib==0.11
 chardet~=3.0
 keyring==10.3.1
 keyrings.alt==2.2
-AnyQt~=0.0.8
+AnyQt~=0.0.11
 PyQt5~=5.12.3
 pyqtwebengine~=5.12.1
 docutils~=0.16.0

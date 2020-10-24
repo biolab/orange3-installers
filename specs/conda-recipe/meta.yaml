@@ -41,7 +41,7 @@ requirements:
     - keyrings.alt  # for alternative keyring implementations
     - pyqt          ~=5.12.0
     - pyqtgraph     ==0.11.0
-    - anyqt         >=0.0.8
+    - anyqt         >=0.0.11
     - joblib        >=0.9.4
     - python.app    # [osx]
     - serverfiles
@@ -49,7 +49,7 @@ requirements:
     - matplotlib    >=2.0.0
     - opentsne      >=0.4.3
     - pandas        ==1.1.*
-    - orange-canvas-core >=0.1.16
+    - orange-canvas-core >=0.1.18
     - orange-widget-base >=4.8.1
     - pyyaml
     - openpyxl
