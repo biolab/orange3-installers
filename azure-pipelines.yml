@@ -80,6 +80,7 @@ jobs:
         inputs:
           contents: 'orange3/dist/*.dmg'
           targetFolder: $(Build.ArtifactStagingDirectory)
+          flattenFolders: true
 
       - task: PublishBuildArtifacts@1
         inputs:
