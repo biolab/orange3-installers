@@ -62,6 +62,7 @@ if "%CONDA_SPEC_FILE%" == "" (
                  bottleneck=1.3.* ^
                  pyqt=5.12.* ^
                  Orange3=%VERSION% ^
+                 blas=*=openblas ^
         || exit /b !ERRORLEVEL!
 
     "%CONDA%" list -n env --export --explicit --md5 > env-spec.txt
