@@ -50,6 +50,10 @@ if not "%BUILD_LOCAL%" == "" (
 echo VERSION = %VERSION%
 
 if "%CONDA_SPEC_FILE%" == "" (
+    rem # prefer conda forge
+    "%CONDA%" config --add channels conda-forge  || exit /b !ERRORLEVEL!
+    "%CONDA%" config --set channel_priority strict
+
     "%CONDA%" create -n env --yes --use-local ^
                  python=%PYTHON_VERSION% ^
                  numpy=1.16.* ^
