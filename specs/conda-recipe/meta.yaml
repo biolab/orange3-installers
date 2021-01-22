@@ -23,9 +23,11 @@ requirements:
     - python
     - setuptools
     - numpy         1.14.*
+    - cython
     - pip
     - wheel
     - sphinx
+    - recommonmark
   run:
     - python
     - setuptools    >=36.3
