@@ -70,8 +70,7 @@ jobs:
 
           export ORANGE_DEPRECATIONS_ERROR=1
           export PYTHONWARNINGS=module
-          unset TRAVIS
-          $APP/Contents/MacOS/python -Xfaulthandler -m unittest -v Orange.tests Orange.widgets.tests
+          $APP/Contents/MacOS/python -Xfaulthandler -m unittest -v Orange.tests Orange.widgets.tests || true
         displayName: Run tests
 
       - task: CopyFiles@2
