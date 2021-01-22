@@ -50,14 +50,19 @@ if not "%BUILD_LOCAL%" == "" (
 echo VERSION = %VERSION%
 
 if "%CONDA_SPEC_FILE%" == "" (
+    rem # prefer conda forge
+    "%CONDA%" config --add channels conda-forge  || exit /b !ERRORLEVEL!
+    "%CONDA%" config --set channel_priority strict
+
     "%CONDA%" create -n env --yes --use-local ^
                  python=%PYTHON_VERSION% ^
                  numpy=1.16.* ^
-                 scipy=1.2.* ^
+                 scipy=1.5.* ^
                  scikit-learn=0.23.* ^
                  bottleneck=1.3.* ^
                  pyqt=5.12.* ^
                  Orange3=%VERSION% ^
+                 blas=*=openblas ^
         || exit /b !ERRORLEVEL!
 
     "%CONDA%" list -n env --export --explicit --md5 > env-spec.txt
