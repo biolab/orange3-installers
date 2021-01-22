@@ -16,10 +16,6 @@ environment:
     BUILD_LOCAL: 1
 
     PIP_DISABLE_PIP_VERSION_CHECK: 1
-    # disable threaded builds on Python 3.5+ when using numpy's distutils
-    # (https://github.com/numpy/numpy/issues/7607)
-    BUILD_GLOBAL_OPTIONS: config --with-htmlhelp build -j1
-
     # build env dependencies for building orange3 wheels or any of its
     # dependencies that do not have wheels available
     BUILD_DEPS: --find-links https://orange.biolab.si/download/files/wheelhouse/ --only-binary numpy wheel==0.29.0 pip~=19.0 numpy~=1.14.0 sphinx==1.8.2

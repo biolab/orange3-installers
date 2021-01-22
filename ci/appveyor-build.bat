@@ -34,7 +34,7 @@ if not "%BUILD_LOCAL%" == "" (
     python -c "import sys; assert not sys.version_info[:3] == (3, 6, 1)" ^
         || exit /b !ERRORLEVEL!
 
-    python setup.py %BUILD_GLOBAL_OPTIONS% bdist_wheel -d ../wheels  ^
+    python -m pip wheel -w ../wheels --no-deps -vv . ^
         || exit /b !ERRORLEVEL!
 
     for /f %%s in ( 'python setup.py --version' ) do (
