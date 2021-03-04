@@ -62,7 +62,7 @@ requirements:
     - cachecontrol   >=0.12.6
     - msgpack-python >=1.0
     - catboost
-    - xgboost       # [not win]
+    - xgboost
 
 test:
   # Python imports
