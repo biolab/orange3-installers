@@ -23,6 +23,8 @@ jobs:
       matrix:
         PY38:
           PYTHON_VERSION: 3.8.8
+        PY39:
+          PYTHON_VERSION: 3.9.2
 
     steps:
       - bash: |
