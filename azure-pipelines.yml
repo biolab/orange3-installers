@@ -21,9 +21,9 @@ jobs:
 
     strategy:
       matrix:
-        PY38:
-          PYTHON_VERSION: 3.8.8
-          REQUIREMENTS: requirements.txt
+#        PY38:
+#          PYTHON_VERSION: 3.8.8
+#          REQUIREMENTS: requirements.txt
         PY39:
           PYTHON_VERSION: 3.9.2
           REQUIREMENTS: requirements-py39.txt
