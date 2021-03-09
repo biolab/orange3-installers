@@ -23,8 +23,10 @@ jobs:
       matrix:
         PY38:
           PYTHON_VERSION: 3.8.8
+          REQUIREMENTS: requirements.txt
         PY39:
           PYTHON_VERSION: 3.9.2
+          REQUIREMENTS: requirements-py39.txt
 
     steps:
       - bash: |
@@ -45,9 +47,9 @@ jobs:
           set -e
           cd orange3
           if [[ $BUILD_LOCAL ]]; then
-              PIP_ARGS=( --pip-arg={-r,../specs/macos/requirements.txt,./} );
+              PIP_ARGS=( --pip-arg={-r,../specs/macos/$REQUIREMENTS,./} );
           else
-              PIP_ARGS=( --pip-arg={-r,../specs/macos/requirements.txt,Orange3==$BUILD_COMMIT} );
+              PIP_ARGS=( --pip-arg={-r,../specs/macos/$REQUIREMENTS,Orange3==$BUILD_COMMIT} );
           fi
           ../scripts/macos/build-macos-app.sh "${PIP_ARGS[@]}" --python-version=${PYTHON_VERSION} "$APP"
         displayName: Build application bundle
