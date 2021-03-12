@@ -444,9 +444,18 @@ Section "Python ${PYTHON_VERSION} (${BITS} bit)" SectionPython
 
     ${LogWrite} "Installing Python ${PYTHON_VERSION} (${BITS} bit)"
     ${ExtractTemp} "${BASEDIR}\${PYINSTALLER}" "${TEMPDIR}"
+    MessageBox MB_OKCANCEL \
+        '${APPLICATIONNAME} requires a Python distribution \
+        installed on the system. This will be done by running a separate \
+        installer program.$\r$\n$\r$\n\
+        Click Ok to continue.' \
+        /SD IDOK IDOK continue_python_ IDCANCEL abort_python_
+    abort_python_:
+        Abort "Aborting Python installation (user cancelled)."
+    continue_python_:
+        ${LogWrite} "Running python installer"
     DetailPrint "Executing external installer for Python \
                 ${PYTHON_VERSION} (${BITS} bit)"
-    # TODO: Ask for confirmation again?
     ${PyInstall} "${TEMPDIR}\${PYINSTALLER}" $MultiUser.InstallMode $0
     ${If} $0 != 0
         Abort "Python installation failed (error value: $0)"
