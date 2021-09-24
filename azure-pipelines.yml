@@ -27,7 +27,7 @@ jobs:
     steps:
       - bash: |
           set -e
-          git clone -q --depth 100 $REPO
+          git clone -q $REPO
           cd orange3
           git fetch origin $BUILD_BRANCH
           git checkout $BUILD_COMMIT
