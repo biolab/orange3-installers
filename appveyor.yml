@@ -5,9 +5,9 @@ environment:
     # git repo from which to pull orange3 sources
     REPO: https://github.com/biolab/orange3.git
     # Branch/ref from which to pull
-    BUILD_BRANCH: master
+    BUILD_BRANCH: stable
     # Commit ref/tag to checkout
-    BUILD_COMMIT: 3.30.0
+    BUILD_COMMIT: 3.30.1
 
     # Build the package locally or use the build packages from
     # conda-forge / PyPI. The BUILD_COMMIT must match the package version

@@ -7,8 +7,8 @@ trigger:
 
 variables:
   REPO: https://github.com/biolab/orange3.git
-  BUILD_BRANCH: master
-  BUILD_COMMIT: 3.30.0
+  BUILD_BRANCH: stable
+  BUILD_COMMIT: 3.30.1
   BUILD_LOCAL: 
 
   APP: "/Applications/Orange3.app"
