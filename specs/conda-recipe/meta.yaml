@@ -51,18 +51,20 @@ requirements:
     - matplotlib    >=2.0.0
     - opentsne      >=0.6.0
     - pandas        >=1.0.0
-    - orange-canvas-core >=0.1.19
-    - orange-widget-base >=4.13.0
+    - orange-canvas-core >=0.1.21
+    - orange-widget-base >=4.14.0
     - pyyaml
     - openpyxl
     - baycomp    >=1.0.2
-    - httpx      >=0.14.0,<0.17
+    - httpx      >=0.14.0,<0.20
 
     # cachecontrol 0.12.5 is incompatible with msgpack-python=1.0
     - cachecontrol   >=0.12.6
     - msgpack-python >=1.0
     - catboost
     - xgboost
+    - qtconsole >=4.7.2
+    - pygments >=2.8.0
 
 test:
   # Python imports
