@@ -65,6 +65,7 @@ if "%CONDA_SPEC_FILE%" == "" (
                  scikit-learn=0.23.* ^
                  bottleneck=1.3.* ^
                  pyqt=5.12.* ^
+                 pyqtgraph=0.12.2 ^
                  Orange3=%VERSION% ^
                  blas=*=openblas ^
         || exit /b !ERRORLEVEL!
