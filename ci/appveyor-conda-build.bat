@@ -28,7 +28,7 @@ if "%MINICONDA_VERSION%" == "" (
 
 if not "%BUILD_LOCAL%" == "" (
     "%CONDA%" install --yes conda-build=%CONDA_BUILD_VERSION%  || exit /b !ERRORLEVEL!
-    "%CONDA%" build --python %PYTHON_VERSION% ../specs/conda-recipe ^
+    "%CONDA%" build --no-test --python %PYTHON_VERSION% conda-recipe ^
         || exit /b !ERRORLEVEL!
 
     rem # Copy the build conda pkg to artifacts dir
