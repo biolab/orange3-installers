@@ -40,6 +40,10 @@ jobs:
         displayName: 'Use Python 3.6'
 
       - bash: |
+          brew install create-dmg
+        displayName: 'Install create-dmg'
+
+      - bash: |
           set -e
           cd orange3
           if [[ $BUILD_LOCAL ]]; then
