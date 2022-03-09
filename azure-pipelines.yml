@@ -17,7 +17,7 @@ jobs:
   - job: 'build_macos_dmg'
     displayName: Build macOS installer
     pool:
-      vmImage: macOS-10.14
+      vmImage: macOS-10.15
 
     strategy:
       matrix:
@@ -38,6 +38,10 @@ jobs:
           versionSpec: '3.6'
           architecture: 'x64'
         displayName: 'Use Python 3.6'
+
+      - bash: |
+          brew install create-dmg
+        displayName: 'Install create-dmg'
 
       - bash: |
           set -e
