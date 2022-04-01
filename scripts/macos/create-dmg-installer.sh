@@ -72,6 +72,8 @@ create-dmg \
   --hide-extension "Orange3.app" \
   --icon "Orange3.app" 95 125 \
   --app-drop-link 305 125 \
+  --hdiutil-verbose \
+  --bless \
   "${DMG}" \
   "${TMP_TEMPLATE}"
 
