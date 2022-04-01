@@ -27,6 +27,5 @@ xlsxwriter
 serverfiles
 opentsne~=0.6.0
 python-louvain>=0.13
-pandas>=1.0.0
 xgboost
 catboost
