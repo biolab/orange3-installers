@@ -18,7 +18,7 @@ environment:
     PIP_DISABLE_PIP_VERSION_CHECK: 1
     # build env dependencies for building orange3 wheels or any of its
     # dependencies that do not have wheels available
-    BUILD_DEPS: wheel==0.29.0 pip~=19.0
+    BUILD_DEPS: wheel~=0.37.0 pip~=22.0.3
 
   # Note the python version here refers to the one included in the installer
   # not the one used for building/packaging
