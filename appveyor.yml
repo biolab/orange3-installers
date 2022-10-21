@@ -13,7 +13,7 @@ environment:
     # conda-forge / PyPI. The BUILD_COMMIT must match the package version
     # to build.
     # Comment/override this if building release versions.
-    BUILD_LOCAL: 0
+    BUILD_LOCAL:
 
     PIP_DISABLE_PIP_VERSION_CHECK: 1
     # build env dependencies for building orange3 wheels or any of its
