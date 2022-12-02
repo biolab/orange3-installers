@@ -35,6 +35,7 @@ if "%MINICONDA_VERSION%" == "" (
 
 if not "%BUILD_LOCAL%" == "" (
     "%CONDA%" install --yes conda-build=%CONDA_BUILD_VERSION%  || exit /b !ERRORLEVEL!
+    "%CONDA%" install --yes git
     "%CONDA%" build --no-test --python %PYTHON_VERSION% conda-recipe ^
         || exit /b !ERRORLEVEL!
 
