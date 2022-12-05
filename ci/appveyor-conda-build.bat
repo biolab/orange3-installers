@@ -1,4 +1,4 @@
-@echo off
+@echo on
 setlocal EnableDelayedExpansion
 
 if "%PYTHON_VERSION%" == "" (
@@ -9,6 +9,13 @@ if "%PYTHON_VERSION%" == "" (
 if  "%PLATTAG%" == "" (
     echo Missing PLATTAG variable >&2
     exit /b 1
+)
+
+rem activate the root conda environment (miniconda3 4.7.0 installs
+rem libarchive that requires this - conda cannot be used as a executable
+rem without activation first)
+if exist "%CONDA%\..\activate" (
+    call "%CONDA%\..\activate"
 )
 
 "%CONDA%" config --append channels conda-forge  || exit /b !ERRORLEVEL!
@@ -28,6 +35,7 @@ if "%MINICONDA_VERSION%" == "" (
 
 if not "%BUILD_LOCAL%" == "" (
     "%CONDA%" install --yes conda-build=%CONDA_BUILD_VERSION%  || exit /b !ERRORLEVEL!
+    "%CONDA%" install --yes git
     "%CONDA%" build --no-test --python %PYTHON_VERSION% conda-recipe ^
         || exit /b !ERRORLEVEL!
 
@@ -60,9 +68,11 @@ if "%CONDA_SPEC_FILE%" == "" (
 
     "%CONDA%" create -n env --yes --use-local ^
                  python=%PYTHON_VERSION% ^
-                 numpy=1.21.* ^
-                 scipy=1.7.* ^
-                 scikit-learn=1.0.* ^
+                 numpy=1.23.* ^
+                 scipy=1.9.* ^
+                 scikit-learn=1.1.* ^
+                 pandas=1.4.* ^
+                 pyqtgraph=0.13.* ^
                  bottleneck=1.3.* ^
                  pyqt=5.15.* ^
                  pyqtwebengine=5.15.* ^
