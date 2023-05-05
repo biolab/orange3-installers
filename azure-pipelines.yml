@@ -10,7 +10,7 @@ jobs:
   - job: 'build_macos_dmg'
     displayName: Build macOS installer
     pool:
-      vmImage: macOS-10.15
+      vmImage: macOS-11
 
     strategy:
       matrix:
