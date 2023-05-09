@@ -24,3 +24,5 @@ xlsxwriter
 serverfiles
 opentsne~=0.3.0
 python-louvain>=0.13
+# https://github.com/ionrock/cachecontrol/issues/292
+urllib3==1.26.15  
