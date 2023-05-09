@@ -10,6 +10,7 @@ on:
 
 jobs:
   build:
+    name: Build ${{ matrix.name }}
     runs-on: windows-2019
     env:
       # git repo from which to pull orange3 sources
@@ -30,25 +31,30 @@ jobs:
       # dependencies that do not have wheels available
       BUILD_DEPS: wheel~=0.37.0 pip~=22.0.3
 
+      # conda build envs
+      CONDA: C:\Miniconda\Scripts\conda
+      MINICONDA_VERSION: 'py39_4.12.0'
+      CONDA_BUILD_VERSION: '3.22'
+      CONDA_USE_ONLY_TAR_BZ2: ""
+      CONDA_SPEC_FILE:
+
+      # python-pip build
+      ENVSPEC: ../specs/win/PY38.txt
+
     strategy:
       fail-fast: False
       # Note the python version here refers to the one included in the installer
       # not the one used for building/packaging
       matrix:
         include:
-          - PYTHON_VERSION: '3.9.12'
+          - name: "CONDA"
+            PYTHON_VERSION: '3.9.12'
             PLATTAG: win_amd64
-            CONDA: C:\Miniconda\Scripts\conda
             PYTHON: C:\Miniconda\python
-            MINICONDA_VERSION: 'py39_4.12.0'
-            CONDA_BUILD_VERSION: '3.22'
-            CONDA_USE_ONLY_TAR_BZ2: ""
-            CONDA_SPEC_FILE:
-            # CONDA_SPEC_FILE: ..\specs\win\conda-spec.txt
 
-          - PYTHON_VERSION: '3.9.13'
+          - name: "PIP-based"
+            PYTHON_VERSION: '3.9.13'
             PLATTAG: win_amd64
-            ENVSPEC: ../specs/win/PY38.txt
             PYTHON: C:\Python39-x64
 
     steps:
@@ -67,6 +73,11 @@ jobs:
           if not "%CONDA%" == "" ( rmdir /q /s "C:\Program Files (x86)\Windows Kits\10\include\wdf" )
           if not "%CONDA%" == "" ( ..\ci\appveyor-conda-build.bat )
           if "%CONDA%" == "" ( ..\ci\appveyor-build.bat )
+        env:
+          PYTHON_VERSION: ${{ matrix.PYTHON_VERSION }}
+          PLATTAG: ${{ matrix.PLATTAG }}
+          ENVSPEC: ${{ matrix.ENVSPEC }}
+          PYTHON: ${{ matrix.PYTHON }}
 
       - name: Find installers
         shell: cmd
