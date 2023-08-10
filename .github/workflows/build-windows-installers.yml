@@ -69,13 +69,15 @@ jobs:
           ref: master
           path: orange3
 
+      - name: Common config
+        shell: cmd
+        run: pacman -S --noconfirm zip unzip
+
       - name: Build Miniconda installer
         if: matrix.name == 'Conda'
         shell: cmd
         run: |
           cd orange3
-          set "PATH=C:\msys64\usr\bin;C:\Program Files (x86)\NSIS;%PATH%"
-          pacman -S --noconfirm zip unzip
           rmdir /q /s "C:\Program Files (x86)\Windows Kits\10\include\wdf"
           CALL ..\ci\appveyor-conda-build.bat
         env:
@@ -86,6 +88,7 @@ jobs:
         if: matrix.name == 'PIP-based'
         shell: cmd
         run: |
+          dir
           cd orange3
           CALL ci\appveyor-build.bat
         env:
