@@ -69,10 +69,6 @@ jobs:
           ref: master
           path: orange3
 
-      - name: Common config
-        shell: cmd
-        run: pacman -S --noconfirm zip unzip
-
       - name: Build Miniconda installer
         if: matrix.name == 'Conda'
         shell: cmd

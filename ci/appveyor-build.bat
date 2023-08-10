@@ -46,6 +46,7 @@ echo VERSION  = "%VERSION%"
 rem add msys2 and NSIS to path
 set "PATH=C:\msys64\usr\bin;C:\Program Files (x86)\NSIS;%PATH%"
 rem ensure unzip is present in msys2
+pacman -S --noconfirm zip unzip
 bash -c "which unzip"                  || exit /b %ERRORLEVEL%
 bash -e ../scripts/windows/build-win-installer.sh ^
      --find-links=../wheels ^

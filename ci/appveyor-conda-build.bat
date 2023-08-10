@@ -86,6 +86,8 @@ if "%CONDA_SPEC_FILE%" == "" (
 
 type "%CONDA_SPEC_FILE%"
 
+PATH=C:\msys64\usr\bin;C:\Program Files (x86)\NSIS;%PATH%
+pacman -S --noconfirm zip unzip
 set "PATH=C:\msys64\usr\bin;C:\Program Files (x86)\NSIS;%PATH%"
 bash -e ../scripts/windows/build-conda-installer.sh ^
         --platform %PLATTAG% ^
