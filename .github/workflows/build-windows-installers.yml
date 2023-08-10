@@ -13,10 +13,6 @@ jobs:
     name: Build ${{ matrix.name }}
     runs-on: windows-2019
     env:
-      # git repo from which to pull orange3 sources
-      REPO: https://github.com/biolab/orange3.git
-      # Branch/ref from which to pull
-      BUILD_BRANCH: master
       # Commit ref/tag to checkout
       BUILD_COMMIT: FETCH_HEAD
 
@@ -58,19 +54,25 @@ jobs:
 
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Set worker Python version
         uses: actions/setup-python@v4
         with:
-          python-version: '3.9' 
+          python-version: '3.9'
+
+      - name: Checkout Orange
+        uses: actions/checkout@v3
+        with:
+          # git repo from which to pull orange3 sources
+          repository: biolab/orange3
+          # Branch/ref from which to pull
+          ref: master
+          path: orange3
+
       - name: Build script
         shell: cmd
         run: |
-          git clone -q %REPO%
-          cd orange3
-          git fetch origin %BUILD_BRANCH%
-          git checkout %BUILD_COMMIT%
-
+          cd orange3  #todo: get rid
           set "PATH=C:\msys64\usr\bin;C:\Program Files (x86)\NSIS;%PATH%"
           pacman -S --noconfirm zip unzip
           if "${{ matrix.name }}" == "Conda" ( rmdir /q /s "C:\Program Files (x86)\Windows Kits\10\include\wdf" )
