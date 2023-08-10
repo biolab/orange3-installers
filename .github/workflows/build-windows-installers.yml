@@ -72,7 +72,7 @@ jobs:
       - name: Build script
         shell: cmd
         run: |
-          cd orange3  #todo: get rid
+          cd orange3
           set "PATH=C:\msys64\usr\bin;C:\Program Files (x86)\NSIS;%PATH%"
           pacman -S --noconfirm zip unzip
           if "${{ matrix.name }}" == "Conda" ( rmdir /q /s "C:\Program Files (x86)\Windows Kits\10\include\wdf" )
