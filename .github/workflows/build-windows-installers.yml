@@ -85,11 +85,7 @@ jobs:
       - name: Build PIP-based installer
         if: matrix.name == 'PIP-based'
         shell: cmd
-        run: |
-          cd orange3
-          set "PATH=C:\msys64\usr\bin;C:\Program Files (x86)\NSIS;%PATH%"
-          pacman -S --noconfirm zip unzip
-          if not "${{ matrix.name }}" == "Conda" ( CALL ..\ci\appveyor-build.bat )
+        run: CALL ci\appveyor-build.bat
         env:
           PYTHON_VERSION: ${{ matrix.PYTHON_VERSION }}
           PLATTAG: ${{ matrix.PLATTAG }}
