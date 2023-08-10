@@ -75,7 +75,7 @@ jobs:
         run: |
           cd orange3
           rmdir /q /s "C:\Program Files (x86)\Windows Kits\10\include\wdf"
-          CALL ..\ci\build-minicond-installer.bat
+          %GITHUB_WORKSPACE%\ci\build-minicond-installer.bat
         env:
           PYTHON_VERSION: ${{ matrix.PYTHON_VERSION }}
           PLATTAG: ${{ matrix.PLATTAG }}
@@ -85,7 +85,7 @@ jobs:
         shell: cmd
         run: |
           cd orange3
-          CALL ..\ci\build-win-installer.bat
+          %GITHUB_WORKSPACE%\ci\build-win-installer.bat
         env:
           PYTHON_VERSION: ${{ matrix.PYTHON_VERSION }}
           PLATTAG: ${{ matrix.PLATTAG }}
