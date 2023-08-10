@@ -85,7 +85,9 @@ jobs:
       - name: Build PIP-based installer
         if: matrix.name == 'PIP-based'
         shell: cmd
-        run: CALL ci\appveyor-build.bat
+        run: |
+          cd orange3
+          CALL ci\appveyor-build.bat
         env:
           PYTHON_VERSION: ${{ matrix.PYTHON_VERSION }}
           PLATTAG: ${{ matrix.PLATTAG }}
