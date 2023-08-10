@@ -17,10 +17,6 @@ set SPECARGS=--python-version %PYTHON_VERSION% --platform %PLATTAG% --pip-arg=-r
 echo PYTAG    = %PYTAG%
 echo SPECARGS = %SPECARGS%
 
-rem Store/restore path around the build to not affect the tests later
-set PATH_BEFORE_BUILD=%PATH%
-set "PATH=%PYTHON%;%PYTHON%\Scripts;%PATH%"
-
 python --version                     || exit /b !ERRORLEVEL!
 python -m pip --version              || exit /b !ERRORLEVEL!
 
@@ -66,8 +62,5 @@ for /f %%s in ( 'sha256sum -b dist/%INSTALLER%' ) do (
 
 echo INSTALLER = %INSTALLER%
 echo SHA256    = %CHECKSUM%
-
-rem restore original path
-set "PATH=%PATH_BEFORE_BUILD%"
 
 @echo on

@@ -37,6 +37,7 @@ jobs:
       CONDA_BUILD_VERSION: '3.22'
       CONDA_USE_ONLY_TAR_BZ2: ""
       CONDA_SPEC_FILE:
+      PYTHON: C:\Miniconda\python  # todo: change name to miniconda python
 
       # python-pip build
       ENVSPEC: ../specs/win/PY38.txt
@@ -50,16 +51,18 @@ jobs:
           - name: "Conda"
             PYTHON_VERSION: '3.9.12'
             PLATTAG: win_amd64
-            PYTHON: C:\Miniconda\python
 
           - name: "PIP-based"
             PYTHON_VERSION: '3.9.13'
             PLATTAG: win_amd64
-            PYTHON: C:\Python39-x64
 
     steps:
       - name: Checkout repo
         uses: actions/checkout@v2
+      - name: Set worker Python version
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9' 
       - name: Build script
         shell: cmd
         run: |
