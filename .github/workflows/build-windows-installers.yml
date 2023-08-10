@@ -77,7 +77,6 @@ jobs:
         env:
           PYTHON_VERSION: ${{ matrix.PYTHON_VERSION }}
           PLATTAG: ${{ matrix.PLATTAG }}
-          ENVSPEC: ${{ matrix.ENVSPEC }}
           PYTHON: ${{ matrix.PYTHON }}
 
       - name: Find installers
