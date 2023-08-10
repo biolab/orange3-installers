@@ -45,12 +45,14 @@ jobs:
       matrix:
         include:
           - name: Conda
-            PYTHON_VERSION: '3.9.12'
-            PLATTAG: win_amd64
+            python_version: '3.9.12'
+            plattag: win_amd64
+            inst_python: C:\test-install\python
 
           - name: PIP-based
-            PYTHON_VERSION: '3.9.13'
-            PLATTAG: win_amd64
+            python_version: '3.9.13'
+            plattag: win_amd64
+            inst_python: C:\test-install\Scripts\python
 
     steps:
       - name: Checkout repo
@@ -77,8 +79,8 @@ jobs:
           rmdir /q /s "C:\Program Files (x86)\Windows Kits\10\include\wdf"
           %GITHUB_WORKSPACE%\ci\build-minicond-installer.bat
         env:
-          PYTHON_VERSION: ${{ matrix.PYTHON_VERSION }}
-          PLATTAG: ${{ matrix.PLATTAG }}
+          PYTHON_VERSION: ${{ matrix.python_version }}
+          PLATTAG: ${{ matrix.plattag }}
 
       - name: Build PIP-based installer
         if: matrix.name == 'PIP-based'
@@ -87,8 +89,8 @@ jobs:
           cd orange3
           %GITHUB_WORKSPACE%\ci\build-win-installer.bat
         env:
-          PYTHON_VERSION: ${{ matrix.PYTHON_VERSION }}
-          PLATTAG: ${{ matrix.PLATTAG }}
+          PYTHON_VERSION: ${{ matrix.python_version }}
+          PLATTAG: ${{ matrix.plattag }}
 
       - name: Find installers
         shell: cmd
@@ -110,10 +112,6 @@ jobs:
           :: runs 'attached' to the console.
           echo "Installing Orange"
           orange3\dist\%INSTALLER% /S /D=C:\test-install > nul
-          :: The venv and conda envs create different install layouts.
-          # todo
-          if not "${{ matrix.name }}" == "Conda" ( set "PYTHON=C:\test-install\Scripts\python" )
-          if "${{ matrix.name }}" == "Conda" ( set "PYTHON=C:\test-install\python" )
           if "${{ matrix.name }}" == "Conda" ( ci\make-portable-installer.bat C:\test-install %GITHUB_WORKSPACE%\orange3\dist\Orange.zip )
 
           "%PYTHON%" --version
@@ -131,6 +129,8 @@ jobs:
           for /f %%s in ( 'sha256sum -b orange3/dist/%INSTALLER%' ) do ( set "CHECKSUM=%%s" )
           echo INSTALLER = %INSTALLER%
           echo SHA256    = %CHECKSUM%
+        env:
+          PYTHON: ${{ matrix.inst_python }}
 
       - name: Archive installer
         uses: actions/upload-artifact@v2
