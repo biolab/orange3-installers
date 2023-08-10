@@ -70,8 +70,9 @@ jobs:
 
           set "PATH=C:\msys64\usr\bin;C:\Program Files (x86)\NSIS;%PATH%"
           pacman -S --noconfirm zip unzip
-          if not "${{ matrix.name }}" == "Conda" ( CALL rmdir /q /s "C:\Program Files (x86)\Windows Kits\10\include\wdf" )
-          if "${{ matrix.name }}" == "Conda" ( ..\ci\appveyor-conda-build.bat )
+          if "${{ matrix.name }}" == "Conda" ( CALL rmdir /q /s "C:\Program Files (x86)\Windows Kits\10\include\wdf" )
+          if "${{ matrix.name }}" == "Conda" ( CALL ..\ci\appveyor-conda-build.bat )
+          echo "Build PIP-Orange"
           if not "${{ matrix.name }}" == "Conda" ( CALL ..\ci\appveyor-build.bat )
         env:
           PYTHON_VERSION: ${{ matrix.PYTHON_VERSION }}
@@ -97,13 +98,12 @@ jobs:
           dir orange3\dist
           :: Install in silent mode. Output has to be piped somewhere so the installer
           :: runs 'attached' to the console.
-          echo "Install Orange"
+          echo "Installing Orange"
           orange3\dist\%INSTALLER% /S /D=C:\test-install > nul
-          echo "After"
           :: The venv and conda envs create different install layouts.
           if not "${{ matrix.name }}" == "Conda" ( set "PYTHON=C:\test-install\Scripts\python" )
           if "${{ matrix.name }}" == "Conda" ( set "PYTHON=C:\test-install\python" )
-          if not "${{ matrix.name }}" == "Conda" ( ci\appveyor-make-portable.bat C:\test-install %GITHUB_WORKSPACE%\orange3\dist\Orange.zip )
+          if "${{ matrix.name }}" == "Conda" ( ci\appveyor-make-portable.bat C:\test-install %GITHUB_WORKSPACE%\orange3\dist\Orange.zip )
 
           echo "Test pip"
           "%PYTHON%" --version
@@ -112,7 +112,7 @@ jobs:
           :: Test that orange and all dependencies are installed in a consistent state
           "%PYTHON%" -m pip install --no-index --no-cache-dir orange3
 
-          echo "Test test"
+          echo "Run Orange tests"
           :: Run test suite in the installed environment.
           set ORANGE_DEPRECATIONS_ERROR=1
           set PYTHONWARNINGS=module
