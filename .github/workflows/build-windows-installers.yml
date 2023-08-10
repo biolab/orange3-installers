@@ -44,11 +44,11 @@ jobs:
       # not the one used for building/packaging
       matrix:
         include:
-          - name: "Conda"
+          - name: Conda
             PYTHON_VERSION: '3.9.12'
             PLATTAG: win_amd64
 
-          - name: "PIP-based"
+          - name: PIP-based
             PYTHON_VERSION: '3.9.13'
             PLATTAG: win_amd64
 
@@ -69,15 +69,26 @@ jobs:
           ref: master
           path: orange3
 
-      - name: Build script
+      - name: Build Miniconda installer
+        if: matrix.name == 'Conda'
         shell: cmd
         run: |
           cd orange3
           set "PATH=C:\msys64\usr\bin;C:\Program Files (x86)\NSIS;%PATH%"
           pacman -S --noconfirm zip unzip
-          if "${{ matrix.name }}" == "Conda" ( rmdir /q /s "C:\Program Files (x86)\Windows Kits\10\include\wdf" )
-          if "${{ matrix.name }}" == "Conda" ( CALL ..\ci\appveyor-conda-build.bat )
-          echo "Build PIP-Orange"
+          rmdir /q /s "C:\Program Files (x86)\Windows Kits\10\include\wdf"
+          CALL ..\ci\appveyor-conda-build.bat
+        env:
+          PYTHON_VERSION: ${{ matrix.PYTHON_VERSION }}
+          PLATTAG: ${{ matrix.PLATTAG }}
+
+      - name: Build PIP-based installer
+        if: matrix.name == 'PIP-based'
+        shell: cmd
+        run: |
+          cd orange3
+          set "PATH=C:\msys64\usr\bin;C:\Program Files (x86)\NSIS;%PATH%"
+          pacman -S --noconfirm zip unzip
           if not "${{ matrix.name }}" == "Conda" ( CALL ..\ci\appveyor-build.bat )
         env:
           PYTHON_VERSION: ${{ matrix.PYTHON_VERSION }}
@@ -136,7 +147,7 @@ jobs:
 
       - name: Archive build zip
         uses: actions/upload-artifact@v2
-        if: ${{ matrix.name }} == 'Conda'
+        if: matrix.name == 'Conda'
         with:
           name: Installer
           path: orange3/dist/Orange.zip
