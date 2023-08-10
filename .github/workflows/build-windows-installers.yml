@@ -116,20 +116,17 @@ jobs:
           if "${{ matrix.name }}" == "Conda" ( set "PYTHON=C:\test-install\python" )
           if "${{ matrix.name }}" == "Conda" ( ci\make-portable-installer.bat C:\test-install %GITHUB_WORKSPACE%\orange3\dist\Orange.zip )
 
-          echo "Test pip"
           "%PYTHON%" --version
           "%PYTHON%" -m pip --version
           "%PYTHON%" -m pip list --format=freeze
           :: Test that orange and all dependencies are installed in a consistent state
           "%PYTHON%" -m pip install --no-index --no-cache-dir orange3
 
-          echo "Run Orange tests"
           :: Run test suite in the installed environment.
           set ORANGE_DEPRECATIONS_ERROR=1
           set PYTHONWARNINGS=module
           "%PYTHON%" -m unittest -v Orange.tests Orange.widgets.tests || cd .
 
-          echo "End"
           :: Log the filename and the sha checksum
           for /f %%s in ( 'sha256sum -b orange3/dist/%INSTALLER%' ) do ( set "CHECKSUM=%%s" )
           echo INSTALLER = %INSTALLER%
