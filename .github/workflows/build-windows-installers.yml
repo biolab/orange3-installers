@@ -73,14 +73,13 @@ jobs:
 
           set "PATH=C:\msys64\usr\bin;C:\Program Files (x86)\NSIS;%PATH%"
           pacman -S --noconfirm zip unzip
-          if "${{ matrix.name }}" == "Conda" ( CALL rmdir /q /s "C:\Program Files (x86)\Windows Kits\10\include\wdf" )
+          if "${{ matrix.name }}" == "Conda" ( rmdir /q /s "C:\Program Files (x86)\Windows Kits\10\include\wdf" )
           if "${{ matrix.name }}" == "Conda" ( CALL ..\ci\appveyor-conda-build.bat )
           echo "Build PIP-Orange"
           if not "${{ matrix.name }}" == "Conda" ( CALL ..\ci\appveyor-build.bat )
         env:
           PYTHON_VERSION: ${{ matrix.PYTHON_VERSION }}
           PLATTAG: ${{ matrix.PLATTAG }}
-          PYTHON: ${{ matrix.PYTHON }}
 
       - name: Find installers
         shell: cmd
@@ -103,6 +102,7 @@ jobs:
           echo "Installing Orange"
           orange3\dist\%INSTALLER% /S /D=C:\test-install > nul
           :: The venv and conda envs create different install layouts.
+          # todo
           if not "${{ matrix.name }}" == "Conda" ( set "PYTHON=C:\test-install\Scripts\python" )
           if "${{ matrix.name }}" == "Conda" ( set "PYTHON=C:\test-install\python" )
           if "${{ matrix.name }}" == "Conda" ( ci\appveyor-make-portable.bat C:\test-install %GITHUB_WORKSPACE%\orange3\dist\Orange.zip )
@@ -122,7 +122,7 @@ jobs:
 
           echo "End"
           :: Log the filename and the sha checksum
-          for /f %%s in ( 'sha256sum -b installers/%INSTALLER%' ) do ( set "CHECKSUM=%%s" )
+          for /f %%s in ( 'sha256sum -b orange3/dist/%INSTALLER%' ) do ( set "CHECKSUM=%%s" )
           echo INSTALLER = %INSTALLER%
           echo SHA256    = %CHECKSUM%
 
@@ -134,7 +134,7 @@ jobs:
 
       - name: Archive build zip
         uses: actions/upload-artifact@v2
-        if: ${{ matrix.name }} != 'Conda'
+        if: ${{ matrix.name }} == 'Conda'
         with:
           name: Installer
           path: orange3/dist/Orange.zip
