@@ -75,7 +75,7 @@ jobs:
         run: |
           cd orange3
           rmdir /q /s "C:\Program Files (x86)\Windows Kits\10\include\wdf"
-          CALL ..\ci\appveyor-conda-build.bat
+          CALL ..\ci\build-minicond-installer.bat
         env:
           PYTHON_VERSION: ${{ matrix.PYTHON_VERSION }}
           PLATTAG: ${{ matrix.PLATTAG }}
@@ -85,7 +85,7 @@ jobs:
         shell: cmd
         run: |
           cd orange3
-          CALL ..\ci\appveyor-build.bat
+          CALL ..\ci\build-win-installer.bat
         env:
           PYTHON_VERSION: ${{ matrix.PYTHON_VERSION }}
           PLATTAG: ${{ matrix.PLATTAG }}
@@ -114,7 +114,7 @@ jobs:
           # todo
           if not "${{ matrix.name }}" == "Conda" ( set "PYTHON=C:\test-install\Scripts\python" )
           if "${{ matrix.name }}" == "Conda" ( set "PYTHON=C:\test-install\python" )
-          if "${{ matrix.name }}" == "Conda" ( ci\appveyor-make-portable.bat C:\test-install %GITHUB_WORKSPACE%\orange3\dist\Orange.zip )
+          if "${{ matrix.name }}" == "Conda" ( ci\make-portable-installer.bat C:\test-install %GITHUB_WORKSPACE%\orange3\dist\Orange.zip )
 
           echo "Test pip"
           "%PYTHON%" --version
