@@ -77,7 +77,7 @@ jobs:
         run: |
           cd orange3
           rmdir /q /s "C:\Program Files (x86)\Windows Kits\10\include\wdf"
-          %GITHUB_WORKSPACE%\ci\build-minicond-installer.bat
+          %GITHUB_WORKSPACE%\ci\build-miniconda-installer.bat
         env:
           PYTHON_VERSION: ${{ matrix.python_version }}
           PLATTAG: ${{ matrix.plattag }}
