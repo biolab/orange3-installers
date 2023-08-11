@@ -37,7 +37,7 @@ if not "%BUILD_LOCAL%" == "" (
     echo "Build 1"
     "%CONDA%" install --yes conda-build=%CONDA_BUILD_VERSION%  || exit /b !ERRORLEVEL!
     "%CONDA%" install --yes git
-    "%CONDA%" build --no-test --python %PYTHON_VERSION% conda-recipe ^
+    "%CONDA%" build --no-test --python %PYTHON_VERSION% --debug conda-recipe ^
         || exit /b !ERRORLEVEL!
 
     rem # Copy the build conda pkg to artifacts dir
