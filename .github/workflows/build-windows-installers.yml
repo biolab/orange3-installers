@@ -30,7 +30,7 @@ jobs:
       # conda build envs
       CONDA: C:\Miniconda\Scripts\conda
       MINICONDA_VERSION: 'py39_4.12.0'
-      CONDA_BUILD_VERSION: '3.22'
+      CONDA_BUILD_VERSION: '3.26'
       CONDA_USE_ONLY_TAR_BZ2: ""
       CONDA_SPEC_FILE:
       PYTHON: C:\Miniconda\python  # todo: change name to miniconda python
