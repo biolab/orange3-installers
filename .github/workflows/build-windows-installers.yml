@@ -132,15 +132,17 @@ jobs:
         env:
           PYTHON: ${{ matrix.inst_python }}
 
-      - name: Archive installer
-        uses: actions/upload-artifact@v2
+      - name: Archive installer - ${{ matrix.name }}
+        uses: actions/upload-artifact@v3
         with:
           name: Installer
           path: orange3/dist/${{ env.INSTALLER }}
+          if-no-files-found: error
 
       - name: Archive build zip
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         if: matrix.name == 'Conda'
         with:
-          name: Installer
+          name: Installer - ZIP
           path: orange3/dist/Orange.zip
+          if-no-files-found: error
