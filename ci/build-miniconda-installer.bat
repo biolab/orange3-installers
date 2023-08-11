@@ -55,7 +55,7 @@ if not "%BUILD_LOCAL%" == "" (
         copy /Y "%%s" ..\cache\conda-pkgs\  || exit /b !ERRORLEVEL!
     )
 
-    for /f %%s in ( '"%PYTHON%" setup.py --version' ) do (
+    for /f %%s in ( '"%MINICONDA_PYTHON%" setup.py --version' ) do (
         set "VERSION=%%s"
     )
 ) else (
