@@ -14,13 +14,13 @@ jobs:
     runs-on: windows-2019
     env:
       # Commit ref/tag to checkout
-      BUILD_COMMIT: FETCH_HEAD
+      BUILD_COMMIT: 3.35
 
       # Build the package locally or use the build packages from
       # conda-forge / PyPI. The BUILD_COMMIT must match the package version
       # to build.
       # Comment/override this if building release versions.
-      BUILD_LOCAL: 1
+      BUILD_LOCAL: 
 
       PIP_DISABLE_PIP_VERSION_CHECK: 1
       # build env dependencies for building orange3 wheels or any of its
