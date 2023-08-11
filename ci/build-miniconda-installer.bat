@@ -34,6 +34,7 @@ if "%MINICONDA_VERSION%" == "" (
 )
 
 if not "%BUILD_LOCAL%" == "" (
+    echo "Build 1"
     "%CONDA%" install --yes conda-build=%CONDA_BUILD_VERSION%  || exit /b !ERRORLEVEL!
     "%CONDA%" install --yes git
     "%CONDA%" build --no-test --python %PYTHON_VERSION% conda-recipe ^
@@ -42,11 +43,13 @@ if not "%BUILD_LOCAL%" == "" (
     rem # Copy the build conda pkg to artifacts dir
     rem # and the cache\conda-pkgs which is used later by build-conda-installer
     rem # script
+    echo "Build 2"
 
     mkdir ..\conda-pkgs        || exit /b !ERRORLEVEL!
     mkdir ..\cache             || exit /b !ERRORLEVEL!
     mkdir ..\cache\conda-pkgs  || exit /b !ERRORLEVEL!
 
+    echo "Build 3"
     for /f %%s in ( '"%CONDA%" build --output --python %PYTHON_VERSION% ../specs/conda-recipe' ) do (
         copy /Y "%%s" ..\conda-pkgs\  || exit /b !ERRORLEVEL!
         copy /Y "%%s" ..\cache\conda-pkgs\  || exit /b !ERRORLEVEL!
