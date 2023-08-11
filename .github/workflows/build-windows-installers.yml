@@ -65,8 +65,9 @@ jobs:
           # git repo from which to pull orange3 sources
           repository: biolab/orange3
           # Branch/ref from which to pull
-          ref: 50df82a7cb8e4a089b386cce0c5de01ad5490494  #master
+          ref: master
           path: orange3
+          fetch-depth: 0
 
       - name: Build Miniconda installer
         if: matrix.name == 'Conda'
