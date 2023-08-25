@@ -1,7 +1,7 @@
 variables:
   REPO: https://github.com/biolab/orange3.git
   BUILD_BRANCH: master
-  BUILD_COMMIT: 3.35
+  BUILD_COMMIT: 3.35.0
   BUILD_LOCAL: 
 
   APP: "/Applications/Orange3.app"
