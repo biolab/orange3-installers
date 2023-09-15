@@ -61,6 +61,16 @@ mkdir -p "${TMP_TEMPLATE}"/
 cp -a "${APP}" "${TMP_TEMPLATE}"/Orange3.app
 
 mkdir -p "$(dirname "${DMG}")"
+
+EXTRA_DS_STORE=()
+if [[ -n ${SKIP_JENKINS} ]]; then
+  # When create-dmg cannot control Finder.app via oascript we instead just copy
+  # a preexisting .DS_Store file in place
+  EXTRA_DS_STORE+=(
+    --skip-jenkins --add-file .DS_Store "${RES}/DS_Store" 0 0
+  )
+fi
+
 create-dmg \
   --volname "Orange Installer" \
   --volicon "${RES}/VolumeIcon.icns" \
@@ -72,6 +82,7 @@ create-dmg \
   --hide-extension "Orange3.app" \
   --icon "Orange3.app" 95 125 \
   --app-drop-link 305 125 \
+  ${EXTRA_DS_STORE[*]} \
   "${DMG}" \
   "${TMP_TEMPLATE}"
 
