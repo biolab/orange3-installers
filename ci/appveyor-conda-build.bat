@@ -76,6 +76,7 @@ if "%CONDA_SPEC_FILE%" == "" (
                  bottleneck=1.3.* ^
                  pyqt=5.15.* ^
                  pyqtwebengine=5.15.* ^
+                 orange-widget-base=4.22.* ^
                  Orange3=%VERSION% ^
                  blas=*=openblas ^
         || exit /b !ERRORLEVEL!
