@@ -16,8 +16,8 @@ jobs:
     env:
       REPO: https://github.com/biolab/orange3.git
       BUILD_BRANCH: master
-      BUILD_COMMIT: FETCH_HEAD
-      BUILD_LOCAL: 1
+      BUILD_COMMIT: "3.36.1"
+      BUILD_LOCAL: ""
 
       PYTHONFAULTHANDLER: 1
       PIP_NO_PIP_VERSION_CHECK: 1
@@ -72,12 +72,14 @@ jobs:
           if [[ $BUILD_LOCAL ]]; then
             conda mambabuild --no-test --python $PYTHON_VERSION ./orange3/conda-recipe
             VERSION=$(cd orange3; python setup.py --version)
+            EXTRA_ARGS=(-c file:///C:/users/runneradmin/micromamba/envs/build/conda-bld)
           else
             VERSION=$BUILD_COMMIT
+            EXTRA_ARGS=()
           fi
           if [[ ! $CONDA_SPEC_FILE ]]; then
             micromamba create -p ./env --yes \
-                         -c file:///C:/users/runneradmin/micromamba/envs/build/conda-bld \
+                         ${EXTRA_ARGS[*]} \
                          python=$PYTHON_VERSION \
                          numpy=1.24.* \
                          scipy=1.10.* \
