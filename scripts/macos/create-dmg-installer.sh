@@ -57,8 +57,11 @@ echo "============================================="
 
 mkdir -p "${TMP_TEMPLATE}"/
 
+BASENAME=$(basename $APP)
+echo "Copying the app ${BASENAME}"
+
 # Copy the .app directory in place
-cp -a "${APP}" "${TMP_TEMPLATE}"/Orange3.app
+cp -a "${APP}" "${TMP_TEMPLATE}"/"${BASENAME}"
 
 mkdir -p "$(dirname "${DMG}")"
 
@@ -79,8 +82,8 @@ create-dmg \
   --window-size 400 244 \
   --icon-size 75 \
   --text-size 12 \
-  --hide-extension "Orange3.app" \
-  --icon "Orange3.app" 95 125 \
+  --hide-extension "${BASENAME}" \
+  --icon "${BASENAME}" 95 125 \
   --app-drop-link 305 125 \
   ${EXTRA_DS_STORE[*]} \
   "${DMG}" \
