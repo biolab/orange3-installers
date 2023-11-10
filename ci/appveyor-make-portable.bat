@@ -59,7 +59,7 @@ python "%THISHEREDIR%\create_shortcut.py" ^
 
 
 pushd "%TEMP%\.."
-zip --quiet -9 -r temp.zip Orange Orange.lnk
+zip --quiet -9 -r temp.zip Orange Orange.lnk -x 'Orange/pkgs/*' '*.pyc' '*.pyo' '*/__pycache__/*''
 popd
 
 move /y "%TEMP%\..\temp.zip" "%OUTPUT%"
