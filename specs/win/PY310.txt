@@ -12,8 +12,6 @@ bottleneck~=1.3.0
 chardet~=5.0
 keyring~=23.0
 keyrings.alt~=4.0
-pywin32-ctypes==0.0.1
-pyreadline==2.1
 AnyQt~=0.2.0
 
 PyQt5~=5.15.3
