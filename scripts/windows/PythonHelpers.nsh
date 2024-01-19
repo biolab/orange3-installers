@@ -78,11 +78,13 @@
     # Avoid Orange to use Python from Miniconda/Anaconda which is also present under
     # PythonCore. The problem with this Python is that when the environment is not
     # activated it doesn't have acess to the DLL libraries.
-    ${StrStr} ${contains} ${INSTALL_PREFIX} "conda"
-    ${If} ${contains} != ""
+    Push $1
+    ${StrStr} $1 ${INSTALL_PREFIX} "conda"
+    ${If} $1 != ""
         StrCpy ${INSTALL_PREFIX} ""
         StrCpy ${INSTALL_MODE} -1
     ${EndIf}
+    Pop $1
 !macroend
 !define GetPythonInstall "!insertmacro __GET_PYTHON_INSTALL"
 
