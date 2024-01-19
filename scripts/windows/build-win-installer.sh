@@ -342,7 +342,7 @@ EOF
              -DINSTALLERICON="$(win-path "${scriptdir}")/Orange.ico" \
              -DLICENSE_FILE="${BASEDIR}"/license.txt \
              -NOCD \
-             -V4 -WX \
+             -V4 \
              "-X!addincludedir $(win-path "${scriptdir}")" \
              "${nsis_script:?}"
 }
