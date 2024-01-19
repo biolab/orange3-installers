@@ -1,5 +1,6 @@
 
 !include TextFunc.nsh
+!include StrFunc.nsh
 
 # ${GetPythonInstallPEP514} COMPANY TAG $(user_var: INSTALL_PREFIX) $(user_var: INSTALL_MODE)
 #
@@ -73,8 +74,12 @@
     !endif
     ${GetPythonInstallPEP514} PythonCore ${__TAG} ${INSTALL_PREFIX} ${INSTALL_MODE}
     !undef __TAG
-    ${StrContains} ${contains} "conda" ${INSTALL_PREFIX}
-    ${If} ${contains} == "conda"
+
+    # Avoid Orange to use Python from Miniconda/Anaconda which is also present under
+    # PythonCore. The problem with this Python is that when the environment is not
+    # activated it doesn't have acess to the DLL libraries.
+    ${StrStr} ${contains} ${INSTALL_PREFIX} "conda"
+    ${If} ${contains} != ""
         StrCpy ${INSTALL_PREFIX} ""
         StrCpy ${INSTALL_MODE} -1
     ${EndIf}
