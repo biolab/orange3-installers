@@ -73,6 +73,11 @@
     !endif
     ${GetPythonInstallPEP514} PythonCore ${__TAG} ${INSTALL_PREFIX} ${INSTALL_MODE}
     !undef __TAG
+    ${StrContains} ${contains} "conda" ${INSTALL_PREFIX}
+    ${If} ${contains} == "conda"
+        StrCpy ${INSTALL_PREFIX} ""
+        StrCpy ${INSTALL_MODE} -1
+    ${EndIf}
 !macroend
 !define GetPythonInstall "!insertmacro __GET_PYTHON_INSTALL"
 
