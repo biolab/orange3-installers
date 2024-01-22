@@ -353,7 +353,7 @@ EOF
              -DLAUNCHERMODULE="Orange.canvas" \
              "${extransisparams[@]}" \
              -NOCD \
-             -V4 -WX \
+             -V4 \
              "-X!addincludedir $(win-path "${scriptdir}")" \
              "${nsis_script:?}"
 }
