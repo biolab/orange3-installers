@@ -172,7 +172,7 @@ jobs:
     needs: [build, test]
     runs-on: windows-2019
     steps:
-      - uses: actions/checkout@v34
+      - uses: actions/checkout@v4
 
       - name: Setup Python
         uses: actions/setup-python@v4
