@@ -20,18 +20,18 @@ jobs:
       BUILD_LOCAL: 1
 
       PYTHONFAULTHANDLER: 1
-      PIP_NO_PIP_VERSION_CHECK: 1
+      PIP_DISABLE_PIP_VERSION_CHECK: 1
       PIP_CACHE_DIR: .pip-cache
       PIP_PREFER_BINARY: 1
 
       BUILD_DEPS: "wheel~=0.37.0 pip~=23.2.1"
-      ENVSPEC: ./specs/win/PY310.txt
+      ENVSPEC: ./specs/win/requirements.txt
 
     strategy:
       fail-fast: False
       matrix:
         include:
-          - python-version: "3.10.11"
+          - python-version: "3.11.8"
 
     steps:
       - uses: actions/checkout@v3
@@ -39,7 +39,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
-          python-version: "3.10"
+          python-version: "3.11"
 
       - name: Checkout orange3
         shell: bash

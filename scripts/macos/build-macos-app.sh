@@ -100,7 +100,7 @@ cp -a "${DIR}"/skeleton.app/Contents/{Resources,Info.plist.in} \
 ln -fs ../Frameworks/Python.framework/Versions/${PYVER}/Resources/Python.app/Contents/MacOS/Python \
     "${APPDIR}"/Contents/MacOS/PythonApp
 
-ln -fs ../Frameworks/Python.framework/Versions/${PYVER}/bin/python${PYVER} \
+ln -fs ../Frameworks/Python.framework/Versions/${PYVER}/Resources/Python.app/Contents/MacOS/Python \
     "${APPDIR}"/Contents/MacOS/python
 
 "${APPDIR}"/Contents/MacOS/python -m ensurepip
@@ -119,6 +119,7 @@ fi
 
 # Disable user site packages
 export PYTHONNOUSERSITE=1
+export PYTHONSAFEPATH=1
 
 exec "${DIR}"/PythonApp -m Orange.canvas "$@"
 EOF
