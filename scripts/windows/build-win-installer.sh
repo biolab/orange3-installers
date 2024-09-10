@@ -45,6 +45,7 @@ Examples:
 '
 }
 
+# The application name
 NAME=Orange3
 # version is determined at the end when all packages are available
 VERSION=
@@ -56,7 +57,7 @@ PIP_INDEX_ARGS=()
 PIP_ARGS=()
 
 PYTHON_VERSION=
-PLATTAG=
+PLATTAG=win_amd64
 
 while [[ "${1:0:1}" = "-" ]]; do
     case $1 in
@@ -137,12 +138,14 @@ if [[ -d "${BASEDIR:?}" ]]; then
 fi
 
 # BASEDIR/
-#   wheelhouse/
+#   wheels/
 #   requirements.txt
+#   icons/
 
-mkdir -p "${BASEDIR:?}"/wheelhouse
+mkdir -p "${BASEDIR:?}"/wheels
+mkdir -p "${BASEDIR:?}"/icons
 
-mkdir -p "${CACHEDIR:?}"/wheelhouse
+mkdir -p "${CACHEDIR:?}"/wheels
 mkdir -p "${CACHEDIR:?}"/python
 
 
@@ -224,7 +227,7 @@ fetch-python() {
 fetch-requirements() {
     # Download binary packages for the specified platform (all packages
     # must be available as .whl files)
-    local wheeldir="${CACHEDIR}/wheelhouse"
+    local wheeldir="${CACHEDIR}/wheels"
     pip download \
         "${PIP_INDEX_ARGS[@]}" \
         --dest "${wheeldir}" \
@@ -236,18 +239,18 @@ fetch-requirements() {
         "$@"
 }
 
-# Package install requirements in "${BASEDIR}/wheelhouse".
-# All the requirements MUST have the .whl cached in ${CACHEDIR}/wheelhouse
+# Package install requirements in "${BASEDIR}/wheels".
+# All the requirements MUST have the .whl cached in ${CACHEDIR}/wheels
 
 package-requirements() {
     local pyfilename=$(python-installer-filename ${PYTHON_VERSION} ${PLATTAG})
     cp "${CACHEDIR:?}/python/${pyfilename:?}" \
        "${BASEDIR:?}/"
-    local wheeldir="${CACHEDIR:?}/wheelhouse"
+    local wheeldir="${CACHEDIR:?}/wheels"
     pip download \
         --no-index \
         --find-links "${wheeldir}" \
-        --dest "${BASEDIR:?}/wheelhouse" \
+        --dest "${BASEDIR:?}/wheels" \
         --only-binary :all: \
         --python-version "${PYTAG}" \
         --platform  "${PLATTAG}" \
@@ -256,12 +259,9 @@ package-requirements() {
 
     echo "# Env spec " > "${BASEDIR:?}"/requirements.txt
     (
-        cd "${BASEDIR:?}/wheelhouse"
+        cd "${BASEDIR:?}/wheels"
         ls -1 *.whl
     ) >> "${BASEDIR:?}/requirements.txt"
-
-    mkdir -p "${BASEDIR:?}/icons"
-    cp "$(dirname "$0")"/{orange.ico,OrangeOWS.ico} "${BASEDIR:?}/icons"
 }
 
 
@@ -331,7 +331,7 @@ EOF
 
     makensis -DOUTFILENAME="${outpath}/${filename}" \
              -DAPPNAME=Orange \
-             -DVERSION=${VERSION} \
+             -DVERSION=${VERSION:?} \
              -DVERMAJOR=${major} -DVERMINOR=${minor} -DVERMICRO=${micro} \
              -DPYMAJOR=${pymajor} -DPYMINOR=${pyminor} -DPYMICRO=${pymicro} \
              -DPYARCH=${PLATTAG} \
@@ -341,6 +341,7 @@ EOF
              -DINSTALL_REGISTRY_KEY=OrangeCanvas \
              -DINSTALLERICON="$(win-path "${scriptdir}")/Orange.ico" \
              -DLICENSE_FILE="${BASEDIR}"/license.txt \
+             -DLAUNCHERMODULE=Orange.canvas \
              -NOCD \
              -V4 \
              "-X!addincludedir $(win-path "${scriptdir}")" \
@@ -353,8 +354,11 @@ fetch-python ${PYTHON_VERSION} ${PLATTAG} "${CACHEDIR:?}"/python
 fetch-requirements "${PIP_ARGS[@]}"
 package-requirements "${PIP_ARGS[@]}"
 
+# move icons in place
+cp "${DIRNAME}"/{"Orange.ico","OrangeOWS.ico"} "${BASEDIR:?}/icons"
+
 shopt -s failglob
-WHEEL=( "${BASEDIR}"/wheelhouse/${NAME}*.whl )
+WHEEL=( "${BASEDIR}"/wheels/${NAME}*.whl )
 shopt -u failglob
 
 if [[ ! "${WHEEL}" ]]; then
