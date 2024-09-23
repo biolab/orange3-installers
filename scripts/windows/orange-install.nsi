@@ -347,8 +347,9 @@ Function DirectoryLeave
     ${If} $R0 == 1
         # Directory exists and is not empty
         ${If} ${FileExists} "$InstDir\${UNINSTALL_EXEFILE}"
+        ${AndIf} ${FileExists} "$InstDir\${LAUNCHER_SHORTCUT_NAME}.lnk"
 !if ${PYINSTALL_TYPE} == Private
-        ${AndIf} ${FileExists} "$InstDir\Python${PYTAG}-${BITS}\*.*"
+        ${AndIf} ${FileExists} "$InstDir\python.exe"
 !else if ${PYINSTALL_TYPE} == Normal
         ${AndIf} ${FileExists} "$InstDir\pyvenv.cfg"
         ${AndIfNot} ${FileExists} "$InstDir\python.exe"
@@ -382,7 +383,7 @@ Function DirectoryLeave
         ${Else}
             ${LogWrite} "$InstDir is not empty, aborting"
             MessageBox MB_OK '"$InstDir" exists and is not empty.$\r$\n \
-                              Please choose annother destination folder.'
+                              Please choose another destination folder.'
             Abort '"$InstDir" exists an is not empty'
         ${EndIf}
     ${EndIf}
@@ -407,34 +408,33 @@ FunctionEnd
 
 !if ${PYINSTALL_TYPE} == Private
 # Install/layout a Python installation inside the
-# $InstDir\Python${PYTAG}-${BITS} folder.
+# $InstDir folder.
 Section "-Python ${PYTHON_VERSION} (${BITS} bit)" SectionPython
     ${If} $InstDir == ""
         Abort "Invalid installation prefix"
     ${EndIf}
     ${LogWrite} "Installing a private python installation"
     DetailPrint 'Installing a private Python ${PYTHON_VERSION} (${BITS} bit) \
-                 in "$InstDir\Python${PYTAG}-${BITS}"'
-    ${ExtractTempRec} "${BASEDIR}\Python\*.*" $InstDir\Python${PYTAG}-${BITS}
-    ${IfNot} ${FileExists} "$InstDir\Python${PYTAG}-${BITS}\python.exe"
+                 in "$InstDir\"'
+    ${ExtractTempRec} "${BASEDIR}\Python\*.*" $InstDir
+    ${IfNot} ${FileExists} "$InstDir\python.exe"
         ${LogWrite} "Failed to install Python in $InstDir$\r$\n\
-                     Python executable not found in: \
-                     $InstDir\Python${PYTAG}-${BITS}"
+                     Python executable not found in: $InstDir"
         Abort "Failed to install Python in $InstDir"
     ${EndIf}
-    ${GetPythonVersion} "$InstDir\Python${PYTAG}-${BITS}\python.exe" $0 $1
+    ${GetPythonVersion} "$InstDir\python.exe" $0 $1
     ${If} $0 != 0
         Abort "Python installation failed (simple command returned an error: $0)"
     ${EndIf}
-    StrCpy $BasePythonPrefix "$InstDir\Python${PYTAG}-${BITS}"
+    StrCpy $BasePythonPrefix "$InstDir"
 SectionEnd
 
 Function un.Python
     # Uninstall a private copy of python
     ${If} $InstDir != ""
-    ${AndIf} ${FileExists} "$InstDir\Python${PYTAG}-${BITS}\*.*"
+    ${AndIf} ${FileExists} "$InstDir\*.*"
         # Delete entire dir
-        RMDir /R /REBOOTOK "$InstDir\Python${PYTAG}-${BITS}"
+        RMDir /R /REBOOTOK "$InstDir\"
     ${EndIf}
 FunctionEnd
 

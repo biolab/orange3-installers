@@ -117,7 +117,7 @@ jobs:
       - name: Run tests
         shell: bash
         run: |
-          PYTHON=$(cygpath -u 'D:\test-install\Python311-64\python')
+          PYTHON=$(cygpath -u 'D:\test-install\python')
           $PYTHON --version
           $PYTHON -m pip --version
           $PYTHON -m pip list --format=freeze
