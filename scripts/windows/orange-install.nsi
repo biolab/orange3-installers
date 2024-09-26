@@ -576,6 +576,11 @@ Section -Icons
     ${EndIf}
 SectionEnd
 
+!if ${PYINSTALL_TYPE} == Normal
+    !define ACTIVATE_PATH "$PythonScriptsPrefix\activate.bat"
+!else
+    !define ACTIVATE_PATH "$PythonPrefix\activate.bat"
+!endif
 
 # Create utility shortcut launchers in the $InstDir
 Section -Launchers
@@ -592,22 +597,18 @@ Section -Launchers
         "$InstDir\${LAUNCHER_SHORTCUT_NAME} Debug.lnk" \
         "%COMSPEC%" '/K "$PythonExecPrefix\python.exe" -Psm ${LAUNCHERMODULE} -l4' \
         "$PythonPrefix\share\${ICONDIR}\${APPICON}" 0
-!if ${PYINSTALL_TYPE} == Normal
+
     # A utility shortcut for activating the environment
     CreateShortCut \
         "$InstDir\${APPNAME} Command Prompt.lnk" \
-        "%COMSPEC%" '/K "$PythonScriptsPrefix\activate.bat"'
-!endif
-
+        "%COMSPEC%" '/K "${ACTIVATE_PATH}"'
 SectionEnd
 
 
 Function un.Launchers
     Delete "$InstDir\${LAUNCHER_SHORTCUT_NAME}.lnk"
     Delete "$InstDir\${LAUNCHER_SHORTCUT_NAME} Debug.lnk"
-!if ${PYINSTALL_TYPE} == Normal
     Delete "$InstDir\${APPNAME} Command Prompt.lnk"
-!endif
 FunctionEnd
 
 
@@ -626,12 +627,10 @@ Section "Start Menu Shortcuts" SectionStartMenu
             "$SMPROGRAMS\$StartMenuFolder\${LAUNCHER_SHORTCUT_NAME}.lnk" \
             "$PythonExecPrefix\pythonw.exe" "-Psm ${LAUNCHERMODULE}" \
             "$PythonPrefix\share\${ICONDIR}\${APPICON}" 0
-!if ${PYINSTALL_TYPE} == Normal
         # A utility shortcut for activating the environment
         CreateShortCut \
             "$SMPROGRAMS\$StartMenuFolder\${APPNAME} Command Prompt.lnk" \
-            "%COMSPEC%" '/K "$PythonScriptsPrefix\activate.bat"'
-!endif
+            "%COMSPEC%" '/K "${ACTIVATE_PATH}"'
     ${EndIf}
     !insertmacro MUI_STARTMENU_WRITE_END
 SectionEnd
@@ -663,9 +662,7 @@ Function un.Shortcuts
         ${LogWrite} "Removing Start Menu Shortcuts (from $SMPROGRAMS\$0)"
         DetailPrint "Removing Start Menu shortcuts"
         Delete "$SMPROGRAMS\$0\${LAUNCHER_SHORTCUT_NAME}.lnk"
-!if ${PYINSTALL_TYPE} == Normal
         Delete "$SMPROGRAMS\$0\${APPNAME} Command Prompt.lnk"
-!endif
         RMDir "$SMPROGRAMS\$0"
     ${EndIf}
     ${LogWrite} "Removing Desktop shortcurt"

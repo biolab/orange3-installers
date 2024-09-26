@@ -369,6 +369,7 @@ fetch-python-nupkg ${PYTHON_VERSION} "${CACHEDIR:?}"/python-${PYTHON_VERSION}
 7z x '-i!tools' -y -o"${BUILDBASE}/python" "${CACHEDIR:?}"/python-${PYTHON_VERSION}
 mv "${BUILDBASE}/python/tools" "${BASEDIR}/Python"
 rm -r "${BUILDBASE}/python"
+cp "${DIRNAME}/activate.bat" "${BASEDIR}/Python"
 
 fetch-requirements "${PIP_ARGS[@]}"
 package-requirements "${PIP_ARGS[@]}"
