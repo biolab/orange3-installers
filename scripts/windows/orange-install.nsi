@@ -426,6 +426,9 @@ Section "-Python ${PYTHON_VERSION} (${BITS} bit)" SectionPython
     ${If} $0 != 0
         Abort "Python installation failed (simple command returned an error: $0)"
     ${EndIf}
+    ${ExecToLog} '"$InstDir\python" -m ensurepip'
+    ${ExecToLog} '"$InstDir\python" -m pip config --global set global.prefer-binary 1'
+    # TODO: Add extra index url
     StrCpy $BasePythonPrefix "$InstDir"
 SectionEnd
 
