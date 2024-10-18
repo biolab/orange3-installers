@@ -50,7 +50,6 @@ jobs:
           condarc: >-
             channels:
               - conda-forge
-              - defaults
           environment-name: build
           create-args: conda conda-build boa python=3.11
           init-shell: bash cmd.exe
