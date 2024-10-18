@@ -9,7 +9,7 @@
 #  - APPNAME Application (short) name
 #  - VER{MAJOR,MINOR,MICRO} Application version
 #  - PYINSTALLER basename of the python installer
-#  - INSTALL_REGISTRY_KEY reg subkey name to use for storing install infomation
+#  - INSTALL_REGISTRY_KEY reg subkey name to use for storing install information
 #       (details will be stored under Software/${INSTALL_REGISTRY_KEY})
 
 
@@ -18,8 +18,9 @@
 # use -NOCD parameter when invoking makensis to preserve invoker cwd)
 
 # ${BASEDIR}/
-#   wheelhouse/
+#   wheels/
 #   requirements.txt
+#   icons/
 
 
 ## InstallationTypes:
@@ -48,8 +49,14 @@ Unicode True
     !error "APPNAME must be defined"
 !endif
 
+# Long name, used for shortcuts
 !ifndef APPLICATIONNAME
     !define APPLICATIONNAME ${APPNAME}
+!endif
+
+# Name used in registry keys
+!ifndef INSTALL_REGISTRY_KEY
+    !define INSTALL_REGISTRY_KEY ${APPNAME}
 !endif
 
 !ifdef VERMAJOR & VERMINOR
@@ -73,15 +80,17 @@ Unicode True
     !error "Invalid PYARCH ${PYARCH}"
 !endif
 
+!ifndef LAUNCHERMODULE
+    !error "LAUNCHERMODULE must be defined"
+!endif
 
 !ifndef OUTFILENAME
     !define OUTFILENAME \
         ${APPNAME}-${APPVERSION}-python-${PYMAJOR}.${PYMINOR}-${PYARCH}-setup.exe
 !endif
 
-
 OutFile ${OUTFILENAME}
-Name ${APPLICATIONNAME}-${VERSION}
+Name ${APPNAME}-${VERSION}
 
 !ifndef DEFAULT_INSTALL_FOLDER
     !define DEFAULT_INSTALL_FOLDER ${APPNAME}
@@ -98,17 +107,21 @@ SetCompress "off"
     !define MUI_UNICON ${INSTALLERICON}
 !endif
 
+!ifndef APPICON
+    !define APPICON "${APPNAME}.ico"
+!endif
+
+!ifndef ICONDIR
+    !define ICONDIR "${APPNAME}\icons"
+!endif
+
 !ifndef BASEDIR
     !define BASEDIR .
 !endif
 
 # Application launcher shortcut name (in start menu or on the desktop)
 !ifndef LAUNCHER_SHORTCUT_NAME
-    !define LAUNCHER_SHORTCUT_NAME "${APPNAME}"
-!endif
-
-!ifndef INSTALL_REGISTRY_KEY
-    !error 'INSTALL_REGISTRY_KEY must be defined'
+    !define LAUNCHER_SHORTCUT_NAME "${APPLICATIONNAME}"
 !endif
 
 # Registry key/values where the installation layout is saved
@@ -255,7 +268,7 @@ Var StartMenuFolder
     "Software\Microsoft\Windows\CurrentVersion\Uninstall"
 
 # Full key path for the application uninstall entry in Add/Remove Programs
-!define APPLICATION_UNINSTALL_REGKEY "${WINDOWS_UNINSTALL_REGKEY}\${APPNAME}"
+!define APPLICATION_UNINSTALL_REGKEY "${WINDOWS_UNINSTALL_REGKEY}\${INSTALL_REGISTRY_KEY}"
 
 # Uninstaller base name
 !ifndef UNINSTALL_EXEFILE
@@ -334,8 +347,9 @@ Function DirectoryLeave
     ${If} $R0 == 1
         # Directory exists and is not empty
         ${If} ${FileExists} "$InstDir\${UNINSTALL_EXEFILE}"
+        ${AndIf} ${FileExists} "$InstDir\${LAUNCHER_SHORTCUT_NAME}.lnk"
 !if ${PYINSTALL_TYPE} == Private
-        ${AndIf} ${FileExists} "$InstDir\Python${PYTAG}-${BITS}\*.*"
+        ${AndIf} ${FileExists} "$InstDir\python.exe"
 !else if ${PYINSTALL_TYPE} == Normal
         ${AndIf} ${FileExists} "$InstDir\pyvenv.cfg"
         ${AndIfNot} ${FileExists} "$InstDir\python.exe"
@@ -369,7 +383,7 @@ Function DirectoryLeave
         ${Else}
             ${LogWrite} "$InstDir is not empty, aborting"
             MessageBox MB_OK '"$InstDir" exists and is not empty.$\r$\n \
-                              Please choose annother destination folder.'
+                              Please choose another destination folder.'
             Abort '"$InstDir" exists an is not empty'
         ${EndIf}
     ${EndIf}
@@ -394,41 +408,36 @@ FunctionEnd
 
 !if ${PYINSTALL_TYPE} == Private
 # Install/layout a Python installation inside the
-# $InstDir\Python${PYTAG}-${BITS} folder.
+# $InstDir folder.
 Section "-Python ${PYTHON_VERSION} (${BITS} bit)" SectionPython
     ${If} $InstDir == ""
         Abort "Invalid installation prefix"
     ${EndIf}
     ${LogWrite} "Installing a private python installation"
-    ${ExtractTemp} "${BASEDIR}\${PYINSTALLER}" "${TEMPDIR}"
     DetailPrint 'Installing a private Python ${PYTHON_VERSION} (${BITS} bit) \
-                 in "$InstDir\Python${PYTAG}-${BITS}"'
-
-    ${PyInstallNoRegister} "${TEMPDIR}\${PYINSTALLER}" \
-                           "$InstDir\Python${PYTAG}-${BITS}" $0
-    # msvcredist?
-    ${If} $0 != 0
-        Abort "Python installation failed (error value: $0)"
-    ${EndIf}
-    ${IfNot} ${FileExists} "$InstDir\Python${PYTAG}-${BITS}\python.exe"
+                 in "$InstDir\"'
+    ${ExtractTempRec} "${BASEDIR}\Python\*.*" $InstDir
+    ${IfNot} ${FileExists} "$InstDir\python.exe"
         ${LogWrite} "Failed to install Python in $InstDir$\r$\n\
-                     Python executable not found in: \
-                     $InstDir\Python${PYTAG}-${BITS}"
+                     Python executable not found in: $InstDir"
         Abort "Failed to install Python in $InstDir"
     ${EndIf}
-    ${GetPythonVersion} "$InstDir\Python${PYTAG}-${BITS}\python.exe" $0 $1
+    ${GetPythonVersion} "$InstDir\python.exe" $0 $1
     ${If} $0 != 0
         Abort "Python installation failed (simple command returned an error: $0)"
     ${EndIf}
-    StrCpy $BasePythonPrefix "$InstDir\Python${PYTAG}-${BITS}"
+    ${ExecToLog} '"$InstDir\python" -m ensurepip'
+    ${ExecToLog} '"$InstDir\python" -m pip config --global set global.prefer-binary 1'
+    # TODO: Add extra index url
+    StrCpy $BasePythonPrefix "$InstDir"
 SectionEnd
 
 Function un.Python
     # Uninstall a private copy of python
     ${If} $InstDir != ""
-    ${AndIf} ${FileExists} "$InstDir\Python${PYTAG}-${BITS}\*.*"
+    ${AndIf} ${FileExists} "$InstDir\*.*"
         # Delete entire dir
-        RMDir /R /REBOOTOK "$InstDir\Python${PYTAG}-${BITS}"
+        RMDir /R /REBOOTOK "$InstDir\"
     ${EndIf}
 FunctionEnd
 
@@ -439,7 +448,7 @@ FunctionEnd
 Section "Python ${PYTHON_VERSION} (${BITS} bit)" SectionPython
     SectionIn RO
     ${If} $BasePythonPrefix != ""
-        # The section should heve been unselected (disabled) in .onInit
+        # The section should have been unselected (disabled) in .onInit
         Abort "Installer logic error"
     ${EndIf}
 
@@ -467,10 +476,11 @@ Section "Python ${PYTHON_VERSION} (${BITS} bit)" SectionPython
         Abort "Python installation failed (cannot determine Python \
                installation prefix)."
     ${EndIf}
+    ${LogWrite} "Using python installation: $BasePythonPrefix"
 SectionEnd
 
 Function un.Python
-    # Nothing to do
+    # Nothing to do. Python installation has its own uninstall.
 FunctionEnd
 !endif
 
@@ -515,14 +525,14 @@ Function un.Environment
 FunctionEnd
 
 
-# Instal into the python environment in $PythonPrefix all the required packages
-Section "Install required pacakges" InstallPackages
+# Install into the python environment in $PythonPrefix all the required packages
+Section "Install required packages" InstallPackages
     SectionIn RO
     ${If} $PythonExecPrefix == ""
         Abort "No python executable configured. Cannot proceed."
     ${EndIf}
     ${ExtractTemp} "${BASEDIR}\requirements.txt" "${TEMPDIR}"
-    ${ExtractTempRec} "${BASEDIR}\wheelhouse\*.*" "${TEMPDIR}\wheelhouse"
+    ${ExtractTempRec} "${BASEDIR}\wheels\*.*" "${TEMPDIR}\wheels"
 
     # Install into PythonPrefix
     ${LogWrite} "Installing packages into $PythonPrefix"
@@ -532,7 +542,7 @@ Section "Install required pacakges" InstallPackages
     ${ExecToLog} '\
         "$PythonExecPrefix\python" -m pip install --upgrade \
              --isolated --no-cache-dir --no-index \
-             --find-links "${TEMPDIR}\wheelhouse" \
+             --find-links "${TEMPDIR}\wheels" \
              pip>=9 \
             '
     Pop $0
@@ -544,7 +554,7 @@ Section "Install required pacakges" InstallPackages
     ${ExecToLog} '\
         "$PythonExecPrefix\python" -m pip install \
              --isolated --no-cache-dir --no-index \
-             --find-links "${TEMPDIR}\wheelhouse" \
+             --find-links "${TEMPDIR}\wheels" \
              -r "${TEMPDIR}\requirements.txt" \
         '
     Pop $0
@@ -561,14 +571,19 @@ FunctionEnd
 
 Section -Icons
     # Layout icons if necessary (are not present)
-    ${IfNot} ${FileExists} $PythonPrefix\share\orange3\icons\*.ico"
+    ${IfNot} ${FileExists} $PythonPrefix\share\${ICONDIR}\*.ico"
         ${ExtractTempRec} "${BASEDIR}\icons\*.ico" "${TEMPDIR}\icons"
-        CreateDirectory "$PythonPrefix\share\orange3\icons"
+        CreateDirectory "$PythonPrefix\share\${ICONDIR}"
         CopyFiles /SILENT "${TEMPDIR}\icons\*.ico" \
-                          "$PythonPrefix\share\orange3\icons"
+                          "$PythonPrefix\share\${ICONDIR}"
     ${EndIf}
 SectionEnd
 
+!if ${PYINSTALL_TYPE} == Normal
+    !define ACTIVATE_PATH "$PythonScriptsPrefix\activate.bat"
+!else
+    !define ACTIVATE_PATH "$PythonPrefix\activate.bat"
+!endif
 
 # Create utility shortcut launchers in the $InstDir
 Section -Launchers
@@ -577,30 +592,26 @@ Section -Launchers
     # Startup shortcut
     CreateShortCut \
         "$InstDir\${LAUNCHER_SHORTCUT_NAME}.lnk" \
-        "$PythonExecPrefix\pythonw.exe" "-Psm Orange.canvas" \
-        "$PythonPrefix\share\orange3\icons\orange.ico" 0
+        "$PythonExecPrefix\pythonw.exe" "-Psm ${LAUNCHERMODULE}" \
+        "$PythonPrefix\share\${ICONDIR}\${APPICON}" 0
     # Utility shortcut to launch the application with max log level attached
     # to the console that remains visible after exit
     CreateShortCut \
         "$InstDir\${LAUNCHER_SHORTCUT_NAME} Debug.lnk" \
-        "%COMSPEC%" '/K "$PythonExecPrefix\python.exe" -Psm Orange.canvas -l4' \
-        "$PythonPrefix\share\orange3\icons\orange.ico" 0
-!if ${PYINSTALL_TYPE} == Normal
+        "%COMSPEC%" '/K "$PythonExecPrefix\python.exe" -Psm ${LAUNCHERMODULE} -l4' \
+        "$PythonPrefix\share\${ICONDIR}\${APPICON}" 0
+
     # A utility shortcut for activating the environment
     CreateShortCut \
         "$InstDir\${APPNAME} Command Prompt.lnk" \
-        "%COMSPEC%" '/K "$PythonScriptsPrefix\activate.bat"'
-!endif
-
+        "%COMSPEC%" '/K "${ACTIVATE_PATH}"'
 SectionEnd
 
 
 Function un.Launchers
     Delete "$InstDir\${LAUNCHER_SHORTCUT_NAME}.lnk"
     Delete "$InstDir\${LAUNCHER_SHORTCUT_NAME} Debug.lnk"
-!if ${PYINSTALL_TYPE} == Normal
     Delete "$InstDir\${APPNAME} Command Prompt.lnk"
-!endif
 FunctionEnd
 
 
@@ -617,14 +628,12 @@ Section "Start Menu Shortcuts" SectionStartMenu
         CreateDirectory "$SMPROGRAMS\$StartMenuFolder"
         CreateShortCut \
             "$SMPROGRAMS\$StartMenuFolder\${LAUNCHER_SHORTCUT_NAME}.lnk" \
-            "$PythonExecPrefix\pythonw.exe" "-Psm Orange.canvas" \
-            "$PythonPrefix\share\orange3\icons\orange.ico" 0
-!if ${PYINSTALL_TYPE} == Normal
+            "$PythonExecPrefix\pythonw.exe" "-Psm ${LAUNCHERMODULE}" \
+            "$PythonPrefix\share\${ICONDIR}\${APPICON}" 0
         # A utility shortcut for activating the environment
         CreateShortCut \
             "$SMPROGRAMS\$StartMenuFolder\${APPNAME} Command Prompt.lnk" \
-            "%COMSPEC%" '/K "$PythonScriptsPrefix\activate.bat"'
-!endif
+            "%COMSPEC%" '/K "${ACTIVATE_PATH}"'
     ${EndIf}
     !insertmacro MUI_STARTMENU_WRITE_END
 SectionEnd
@@ -642,11 +651,12 @@ Section "Desktop Shortcuts" SectionDesktop
     DetailPrint "Installing Desktop shortcurt"
     CreateShortCut \
         "$DESKTOP\${LAUNCHER_SHORTCUT_NAME}.lnk" \
-        "$PythonExecPrefix\pythonw.exe" "-Psm Orange.canvas" \
-        "$PythonPrefix\share\orange3\icons\orange.ico" 0
+        "$PythonExecPrefix\pythonw.exe" "-Psm ${LAUNCHERMODULE}" \
+        "$PythonPrefix\share\${ICONDIR}\${APPICON}" 0
 SectionEnd
 
 SectionGroupEnd
+
 
 Function un.Shortcuts
     !insertmacro MUI_STARTMENU_GETFOLDER StartMenuPageID $0
@@ -655,9 +665,7 @@ Function un.Shortcuts
         ${LogWrite} "Removing Start Menu Shortcuts (from $SMPROGRAMS\$0)"
         DetailPrint "Removing Start Menu shortcuts"
         Delete "$SMPROGRAMS\$0\${LAUNCHER_SHORTCUT_NAME}.lnk"
-!if ${PYINSTALL_TYPE} == Normal
         Delete "$SMPROGRAMS\$0\${APPNAME} Command Prompt.lnk"
-!endif
         RMDir "$SMPROGRAMS\$0"
     ${EndIf}
     ${LogWrite} "Removing Desktop shortcurt"
@@ -691,51 +699,51 @@ Section -Register SectionRegister
 
     ${LogWrite} "Register .ows filetype"
     WriteRegStr SHELL_CONTEXT \
-        "Software\Classes\.ows" "" "OrangeCanvas"
+        "Software\Classes\.ows" "" "${INSTALL_REGISTRY_KEY}"
     WriteRegStr SHELL_CONTEXT \
-        "Software\Classes\OrangeCanvas" "" "Orange Workflow"
+        "Software\Classes\${INSTALL_REGISTRY_KEY}" "" "Orange Workflow"
     WriteRegStr SHELL_CONTEXT \
-        "Software\Classes\OrangeCanvas\DefaultIcon" "" \
-        "$PythonPrefix\share\orange3\icons\OrangeOWS.ico"
+        "Software\Classes\${INSTALL_REGISTRY_KEY}\DefaultIcon" "" \
+        "$PythonPrefix\share\${ICONDIR}\OrangeOWS.ico"
     WriteRegStr SHELL_CONTEXT \
-        "Software\Classes\OrangeCanvas\Shell\Open\Command\" "" \
-        '"$PythonExecPrefix\pythonw.exe" -Psm Orange.canvas "%1"'
+        "Software\Classes\${INSTALL_REGISTRY_KEY}\Shell\Open\Command\" "" \
+        '"$PythonExecPrefix\pythonw.exe" -Psm ${LAUNCHERMODULE} "%1"'
 
     WriteUninstaller "$InstDir\${UNINSTALL_EXEFILE}"
 
     # Register uninstaller in Add/Remove Programs
 
-    ${LogWrite} "Register uninstaller (${WINDOWS_UNINSTALL_REGKEY}\${APPNAME})"
+    ${LogWrite} "Register uninstaller (${APPLICATION_UNINSTALL_REGKEY})"
 
     WriteRegStr SHELL_CONTEXT \
-                "${WINDOWS_UNINSTALL_REGKEY}\${APPNAME}" \
-                DisplayName "${APPNAME} ${APPVERSION} (${BITS} bit)"
+                "${APPLICATION_UNINSTALL_REGKEY}" \
+                DisplayName "${APPLICATIONNAME}"
     WriteRegStr SHELL_CONTEXT \
-                "${WINDOWS_UNINSTALL_REGKEY}\${APPNAME}" \
+                "${APPLICATION_UNINSTALL_REGKEY}" \
                 DisplayVersion "${APPVERSION}"
     WriteRegStr SHELL_CONTEXT \
-                "${WINDOWS_UNINSTALL_REGKEY}\${APPNAME}" \
+                "${APPLICATION_UNINSTALL_REGKEY}" \
                 DisplayIcon "$InstDir\${UNINSTALL_EXEFILE}"
     WriteRegStr SHELL_CONTEXT \
-                "${WINDOWS_UNINSTALL_REGKEY}\${APPNAME}" \
+                "${APPLICATION_UNINSTALL_REGKEY}" \
                 "UninstallString" \
                 '"$InstDir\${UNINSTALL_EXEFILE}" /$MultiUser.InstallMode'
     WriteRegStr SHELL_CONTEXT \
-                "${WINDOWS_UNINSTALL_REGKEY}\${APPNAME}" \
+                "${APPLICATION_UNINSTALL_REGKEY}" \
                 "QuietUninstallString" \
                 '"$InstDir\${UNINSTALL_EXEFILE}" /$MultiUser.InstallMode /S'
     WriteRegStr SHELL_CONTEXT \
-                "${WINDOWS_UNINSTALL_REGKEY}\${APPNAME}" \
+                "${APPLICATION_UNINSTALL_REGKEY}" \
                 InstallLocation "$InstDir"
     WriteRegStr SHELL_CONTEXT \
-                "${WINDOWS_UNINSTALL_REGKEY}\${APPNAME}" \
+                "${APPLICATION_UNINSTALL_REGKEY}" \
                 URLInfoAbout http://orange.biolab.si
 
     WriteRegDWORD SHELL_CONTEXT \
-                  "${WINDOWS_UNINSTALL_REGKEY}\${APPNAME}" \
-                   NoModify 1
+                  "${APPLICATION_UNINSTALL_REGKEY}" \
+                  NoModify 1
     WriteRegDWORD SHELL_CONTEXT \
-                  "${WINDOWS_UNINSTALL_REGKEY}\${APPNAME}" \
+                  "${APPLICATION_UNINSTALL_REGKEY}" \
                   NoRepair 1
 SectionEnd
 
@@ -749,28 +757,28 @@ Function un.Register
     ${AndIf} $un.InstallDir == $InstDir
         ${LogWrite} "Deleting reg key: ${INSTALL_SETTINGS_KEY}"
         DeleteRegKey SHCTX "${INSTALL_SETTINGS_KEY}"
-        ${LogWrite} "Deleting reg key: Software\Classes\OrangeCanvas"
-        DeleteRegKey SHCTX Software\Classes\OrangeCanvas
+        ${LogWrite} "Deleting reg key: Software\Classes\${INSTALL_REGISTRY_KEY}"
+        DeleteRegKey SHCTX Software\Classes\${INSTALL_REGISTRY_KEY}
     ${Else}
         ${LogWrite} "InstallDir from ${INSTALL_SETTINGS_KEY} does not match \
                     InstDir ($un.InstallDir != $InstDir). Leaving it."
     ${EndIf}
 
     ReadRegStr $un.InstallDir SHCTX \
-               "${WINDOWS_UNINSTALL_REGKEY}\${APPNAME}" InstallLocation
+               "${APPLICATION_UNINSTALL_REGKEY}" InstallLocation
     ${If} $un.InstallDir != ""
     ${AndIf} $un.InstallDir == $InstDir
-        ${LogWrite} "Deleting reg key: ${WINDOWS_UNINSTALL_REGKEY}\${APPNAME}"
-        DeleteRegKey SHCTX "${WINDOWS_UNINSTALL_REGKEY}\${APPNAME}"
+        ${LogWrite} "Deleting reg key: ${APPLICATION_UNINSTALL_REGKEY}"
+        DeleteRegKey SHCTX "${APPLICATION_UNINSTALL_REGKEY}"
     ${Else}
         ${LogWrite} "InstallLocation from \
-                     ${WINDOWS_UNINSTALL_REGKEY}\${APPNAME} does not match \
+                     ${APPLICATION_UNINSTALL_REGKEY} does not match \
                      InstDir ($0 != $InstDir). Leaving it."
     ${EndIf}
 FunctionEnd
 
 Function LaunchApplication
-    ExecShell "open" "$PythonExecPrefix\pythonw.exe" "-Psm Orange.canvas"
+    ExecShell "open" "$PythonExecPrefix\pythonw.exe" "-Psm ${LAUNCHERMODULE}"
 FunctionEnd
 
 
