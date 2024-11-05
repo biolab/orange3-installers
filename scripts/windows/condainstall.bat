@@ -33,7 +33,6 @@ rem # We need it so add-ons can be installed from conda-forge
 echo Appending conda-forge channel
 echo channels:         > "%PREFIX%\.condarc"
 echo   - conda-forge  >> "%PREFIX%\.condarc"
-echo   - defaults     >> "%PREFIX%\.condarc"
 
 rem Path to base conda env
 for /f %%f in ( '"%CONDA%" info --root' ) do (

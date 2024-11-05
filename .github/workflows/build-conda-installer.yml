@@ -16,7 +16,7 @@ jobs:
     env:
       REPO: https://github.com/biolab/orange3.git
       BUILD_BRANCH: master
-      BUILD_COMMIT: "3.36.1"
+      BUILD_COMMIT: "3.37.0"
       BUILD_LOCAL: ""
 
       PYTHONFAULTHANDLER: 1
@@ -31,7 +31,7 @@ jobs:
       matrix:
         include:
           - python-version: "3.11.8"
-            miniconda-version: "py311_24.1.2-0"
+            miniforge-version: "24.7.1-0"
 
     defaults:
       run:
@@ -50,7 +50,6 @@ jobs:
           condarc: >-
             channels:
               - conda-forge
-              - defaults
           environment-name: build
           create-args: conda conda-build boa python=3.11
           init-shell: bash cmd.exe
@@ -81,9 +80,9 @@ jobs:
             micromamba create -p ./env --yes \
                          ${EXTRA_ARGS[*]} \
                          python=$PYTHON_VERSION \
-                         numpy=1.24.* \
-                         scipy=1.10.* \
-                         scikit-learn=1.1.* \
+                         numpy=1.26.* \
+                         scipy=1.13.* \
+                         scikit-learn=1.5.2 \
                          pandas=1.5.* \
                          pyqtgraph=0.13.* \
                          bottleneck=1.3.* \
@@ -99,7 +98,7 @@ jobs:
       - name: Build installer
         env:
           PLATTAG: win_amd64
-          MINICONDA_VERSION: ${{ matrix.miniconda-version }}
+          MINIFORGE_VERSION: ${{ matrix.miniforge-version }}
         run: |
           mkdir dist
           export PATH="$(cygpath -u 'C:\Program Files (x86)\NSIS'):$PATH"
@@ -108,7 +107,7 @@ jobs:
               --platform $PLATTAG \
               --cache-dir .cache \
               --dist-dir dist \
-              --miniconda-version "$MINICONDA_VERSION" \
+              --miniforge-version "$MINIFORGE_VERSION" \
               --env-spec "$CONDA_SPEC_FILE" \
               --online no
 
