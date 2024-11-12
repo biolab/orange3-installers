@@ -45,6 +45,7 @@ Examples:
 '
 }
 
+# The application name
 NAME=Orange3
 # version is determined at the end when all packages are available
 VERSION=
@@ -56,7 +57,7 @@ PIP_INDEX_ARGS=()
 PIP_ARGS=()
 
 PYTHON_VERSION=
-PLATTAG=
+PLATTAG=win_amd64
 
 while [[ "${1:0:1}" = "-" ]]; do
     case $1 in
@@ -137,12 +138,15 @@ if [[ -d "${BASEDIR:?}" ]]; then
 fi
 
 # BASEDIR/
-#   wheelhouse/
+#   Python/
+#   wheels/
 #   requirements.txt
+#   icons/
 
-mkdir -p "${BASEDIR:?}"/wheelhouse
+mkdir -p "${BASEDIR:?}"/wheels
+mkdir -p "${BASEDIR:?}"/icons
 
-mkdir -p "${CACHEDIR:?}"/wheelhouse
+mkdir -p "${CACHEDIR:?}"/wheels
 mkdir -p "${CACHEDIR:?}"/python
 
 
@@ -195,6 +199,25 @@ python-installer-filename(){
     echo ${filename}
 }
 
+function download {
+    # $ download URL DEST
+    #
+    # Download the URL to DEST path/filename. If DEST already exists
+    # do nothing.
+    local url=${1:?}
+    local dest=${2:?}
+    local tmpname=""
+    mkdir -p $(dirname "${dest}")
+    if [[ ! -f "${dest}" ]]; then
+        tmpname=$(mktemp "${dest}.XXXXX")
+        if curl -fSL -o "${tmpname}" "${url}"; then
+            mv "${tmpname}" "${dest}"
+        else
+            return $?
+        fi
+    fi
+}
+
 fetch-python() {
     # $ fetch-python major.minor.micro plattag [ dest ]
     #
@@ -208,23 +231,20 @@ fetch-python() {
     if [[ ! ${filename} ]]; then
         return 1
     fi
+    download "https://www.python.org/ftp/python/${version}/${filename}" "${dest}/${filename}"
+}
 
-    dest="${dest}/${filename}"
-    if [[ ! -f "${dest}" ]]; then
-        local tmpname=$(mktemp "${dest}.XXXXX")
-        if curl -s -f -L -o "${tmpname}" \
-               https://www.python.org/ftp/python/${version}/${filename}; then
-            mv "${tmpname}" "${dest}"
-        else
-            return $?
-        fi
-    fi
+fetch-python-nupkg() {
+    # $ fetch-python-nupkg major.minor.micro dest
+    local version=${1:?}
+    local dest=${2:?}
+    download https://www.nuget.org/api/v2/package/python/${version} "${dest}"
 }
 
 fetch-requirements() {
     # Download binary packages for the specified platform (all packages
     # must be available as .whl files)
-    local wheeldir="${CACHEDIR}/wheelhouse"
+    local wheeldir="${CACHEDIR}/wheels"
     pip download \
         "${PIP_INDEX_ARGS[@]}" \
         --dest "${wheeldir}" \
@@ -236,18 +256,15 @@ fetch-requirements() {
         "$@"
 }
 
-# Package install requirements in "${BASEDIR}/wheelhouse".
-# All the requirements MUST have the .whl cached in ${CACHEDIR}/wheelhouse
+# Package install requirements in "${BASEDIR}/wheels".
+# All the requirements MUST have the .whl cached in ${CACHEDIR}/wheels
 
 package-requirements() {
-    local pyfilename=$(python-installer-filename ${PYTHON_VERSION} ${PLATTAG})
-    cp "${CACHEDIR:?}/python/${pyfilename:?}" \
-       "${BASEDIR:?}/"
-    local wheeldir="${CACHEDIR:?}/wheelhouse"
+    local wheeldir="${CACHEDIR:?}/wheels"
     pip download \
         --no-index \
         --find-links "${wheeldir}" \
-        --dest "${BASEDIR:?}/wheelhouse" \
+        --dest "${BASEDIR:?}/wheels" \
         --only-binary :all: \
         --python-version "${PYTAG}" \
         --platform  "${PLATTAG}" \
@@ -256,12 +273,9 @@ package-requirements() {
 
     echo "# Env spec " > "${BASEDIR:?}"/requirements.txt
     (
-        cd "${BASEDIR:?}/wheelhouse"
+        cd "${BASEDIR:?}/wheels"
         ls -1 *.whl
     ) >> "${BASEDIR:?}/requirements.txt"
-
-    mkdir -p "${BASEDIR:?}/icons"
-    cp "$(dirname "$0")"/{orange.ico,OrangeOWS.ico} "${BASEDIR:?}/icons"
 }
 
 
@@ -300,14 +314,14 @@ wheel-version() {
     wheel-metadata "${1:?}" | grep -E "^Version: " | cut -d " " -f 2
 }
 
-PYINSTALL_TYPE=Normal
+PYINSTALL_TYPE=Private
 
 make-installer() {
     local scriptdir="$(dirname "$0")"
     local nsis_script="${scriptdir:?}/orange-install.nsi"
     local outpath=${DISTDIR}
     local filename=${NAME}-${VERSION}-Python${PYTAG:?}-${PLATTAG:?}.exe
-    local pyinstaller=$(python-installer-filename ${PYTHON_VERSION} ${PLATTAG})
+    local pyinstaller="Python"
     local basedir=$(win-path "${BASEDIR:?}")
     local versionstr=${VERSION}
     local major=$(version-component 1 "${versionstr}")
@@ -331,7 +345,7 @@ EOF
 
     makensis -DOUTFILENAME="${outpath}/${filename}" \
              -DAPPNAME=Orange \
-             -DVERSION=${VERSION} \
+             -DVERSION=${VERSION:?} \
              -DVERMAJOR=${major} -DVERMINOR=${minor} -DVERMICRO=${micro} \
              -DPYMAJOR=${pymajor} -DPYMINOR=${pyminor} -DPYMICRO=${pymicro} \
              -DPYARCH=${PLATTAG} \
@@ -341,6 +355,7 @@ EOF
              -DINSTALL_REGISTRY_KEY=OrangeCanvas \
              -DINSTALLERICON="$(win-path "${scriptdir}")/Orange.ico" \
              -DLICENSE_FILE="${BASEDIR}"/license.txt \
+             -DLAUNCHERMODULE=Orange.canvas \
              -NOCD \
              -V4 \
              "-X!addincludedir $(win-path "${scriptdir}")" \
@@ -349,12 +364,21 @@ EOF
 
 DIRNAME=$(dirname "${0}")
 
-fetch-python ${PYTHON_VERSION} ${PLATTAG} "${CACHEDIR:?}"/python
+fetch-python-nupkg ${PYTHON_VERSION} "${CACHEDIR:?}"/python-${PYTHON_VERSION}
+
+7z x '-i!tools' -y -o"${BUILDBASE}/python" "${CACHEDIR:?}"/python-${PYTHON_VERSION}
+mv "${BUILDBASE}/python/tools" "${BASEDIR}/Python"
+rm -r "${BUILDBASE}/python"
+cp "${DIRNAME}/activate.bat" "${BASEDIR}/Python"
+
 fetch-requirements "${PIP_ARGS[@]}"
 package-requirements "${PIP_ARGS[@]}"
 
+# move icons in place
+cp "${DIRNAME}"/{"Orange.ico","OrangeOWS.ico"} "${BASEDIR:?}/icons"
+
 shopt -s failglob
-WHEEL=( "${BASEDIR}"/wheelhouse/${NAME}*.whl )
+WHEEL=( "${BASEDIR}"/wheels/${NAME}*.whl )
 shopt -u failglob
 
 if [[ ! "${WHEEL}" ]]; then

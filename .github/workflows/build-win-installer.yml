@@ -78,7 +78,11 @@ jobs:
         run: |
           echo PATH=$PATH
           mkdir dist
-          ./scripts/windows/build-win-installer.sh  --no-index --find-links=./wheels  --python-version $PYTHON_VERSION --platform $PLATTAG --pip-arg=--pre --pip-arg=-r --pip-arg=$ENVSPEC --pip-arg=Orange3
+          ./scripts/windows/build-win-installer.sh  \
+               --no-index --find-links=./wheels \
+               --python-version $PYTHON_VERSION \
+               --platform $PLATTAG \
+               --pip-arg=--pre --pip-arg=-r --pip-arg=$ENVSPEC --pip-arg=Orange3
 
           INSTALLER=( dist/Orange3*.exe )
           SHA256=$( sha256sum -b $INSTALLER )
@@ -113,7 +117,7 @@ jobs:
       - name: Run tests
         shell: bash
         run: |
-          PYTHON=$(cygpath -u 'D:\test-install\Scripts\python')
+          PYTHON=$(cygpath -u 'D:\test-install\python')
           $PYTHON --version
           $PYTHON -m pip --version
           $PYTHON -m pip list --format=freeze
