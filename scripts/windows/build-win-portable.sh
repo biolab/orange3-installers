@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+# !/usr/bin/env bash
 
 NAME=Orange3
 
@@ -11,6 +11,8 @@ PIP_ARGS=()
 
 PYTHON_VERSION=${PYTHON_VERSION:-"3.10.11"}
 
+# Suppress MSYS2 auto unix -> win path expansion
+export MSYS2_ARG_CONV_EXCL="*"
 
 while [[ "${1:0:1}" = "-" ]]; do
     case $1 in
@@ -98,20 +100,20 @@ BUILDDIR_WIN="$(cygpath -w "${BUILDDIR}")"
 
 python -m pip install pywin32
 python "${DIR}/create_shortcut.py" \
-   --target 'cmd.exe' \
+   --target '%SystemRoot%\\system32\\cmd.exe' \
    --arguments '"/C start pythonw.exe -Psm Orange.canvas"' \
    --working-directory "" \
    --window-style Minimized \
    --shortcut "${BUILDDIR_WIN}\Orange.lnk"
 
 python "${DIR}/create_shortcut.py" \
-   --target 'cmd.exe' \
+   --target '%SystemRoot%\\system32\\cmd.exe' \
    --arguments '"/K python.exe -Psm Orange.canvas -l4"' \
    --working-directory "" \
    --shortcut "${BUILDDIR_WIN}/Orange Debug.lnk"
 
 python "${DIR}/create_shortcut.py" \
-   --target 'cmd.exe' \
+   --target '%SystemRoot%\\system32\\cmd.exe' \
    --arguments '"/C start Orange\pythonw.exe -Psm Orange.canvas"' \
    --working-directory "" \
    --window-style Minimized \
