@@ -31,7 +31,7 @@ jobs:
       matrix:
         include:
           - python-version: "3.11"
-            miniforge-version: "24.7.1-0"
+            micromamba-version: "2.1.0-0"
 
     defaults:
       run:
@@ -89,7 +89,9 @@ jobs:
                          pyqt=5.15.* \
                          pyqtwebengine=5.15.* \
                          Orange3=$VERSION \
-                         blas=*=openblas
+                         openTSNE=1.0.1 \
+                         blas=*=openblas \
+                         mamba
             conda list -p ./env --export --explicit --md5 > env-spec.txt
             cat env-spec.txt
             echo "CONDA_SPEC_FILE=env-spec.txt" >> $GITHUB_ENV
@@ -98,7 +100,7 @@ jobs:
       - name: Build installer
         env:
           PLATTAG: win_amd64
-          MINIFORGE_VERSION: ${{ matrix.miniforge-version }}
+          MICROMAMBA_VERSION: ${{ matrix.micromamba-version }}
         run: |
           mkdir dist
           export PATH="$(cygpath -u 'C:\Program Files (x86)\NSIS'):$PATH"
@@ -107,7 +109,7 @@ jobs:
               --platform $PLATTAG \
               --cache-dir .cache \
               --dist-dir dist \
-              --miniforge-version "$MINIFORGE_VERSION" \
+              --micromamba-version "$MICROMAMBA_VERSION" \
               --env-spec "$CONDA_SPEC_FILE" \
               --online no
 
@@ -127,6 +129,8 @@ jobs:
     name: Test
     needs: build
     runs-on: windows-2019
+    env:
+      INSTALL_PATH: "D:\\install path"
     steps:
       - name: Download installer
         uses: actions/download-artifact@v4
@@ -140,14 +144,14 @@ jobs:
           rem # runs 'attached' to the console.
           for %%s in ( Orange3*.exe ) do ( set "INSTALLER=%%s" )
           echo INSTALLER = %INSTALLER%
-          %INSTALLER% /S /D=D:\test-install > nul
+          %INSTALLER% /S /D=%INSTALL_PATH% > nul
       - name: Run tests
         shell: bash
         run: |
-          PYTHON=$(cygpath -u 'D:\test-install\python')
-          $PYTHON --version
-          $PYTHON -m pip --version
-          $PYTHON -m pip list --format=freeze
+          PYTHON=$(cygpath -u "$INSTALL_PATH"'\\python')
+          "$PYTHON" --version
+          "$PYTHON" -m pip --version
+          "$PYTHON" -m pip list --format=freeze
           # Test that orange and all dependencies are installed in a
           # consistent state
           #$PYTHON -m pip install --no-index --no-cache-dir orange3
@@ -156,12 +160,12 @@ jobs:
           export ORANGE_DEPRECATIONS_ERROR=1
           export PYTHONWARNINGS=module
 
-          $PYTHON -m unittest -v Orange.tests Orange.widgets.tests
+          "$PYTHON" -m unittest -v Orange.tests Orange.widgets.tests
 
       - name: Test conda
         shell: cmd
         run: |
-          D:\test-install\Scripts\conda.bat --help
-          D:\test-install\Scripts\conda.bat info
-          D:\test-install\Scripts\activate.bat
+          "%INSTALL_PATH%"\Scripts\conda.bat --help
+          "%INSTALL_PATH%"\Scripts\conda.bat info
+          "%INSTALL_PATH%"\Scripts\activate.bat
           echo %CONDA_PREFIX%
