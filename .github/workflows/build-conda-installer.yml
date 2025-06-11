@@ -16,7 +16,7 @@ jobs:
     env:
       REPO: https://github.com/biolab/orange3.git
       BUILD_BRANCH: master
-      BUILD_COMMIT: "3.37.0"
+      BUILD_COMMIT: "3.38.1"
       BUILD_LOCAL: ""
 
       PYTHONFAULTHANDLER: 1
@@ -30,7 +30,7 @@ jobs:
       fail-fast: False
       matrix:
         include:
-          - python-version: "3.11.8"
+          - python-version: "3.11"
             miniforge-version: "24.7.1-0"
 
     defaults:
