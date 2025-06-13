@@ -90,6 +90,7 @@ jobs:
                          pyqtwebengine=5.15.* \
                          Orange3=$VERSION \
                          openTSNE=1.0.1 \
+                         catboost \
                          blas=*=openblas \
                          mamba
             conda list -p ./env --export --explicit --md5 > env-spec.txt
