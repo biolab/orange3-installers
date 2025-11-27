@@ -542,6 +542,7 @@ Section "Install required packages" InstallPackages
     ${ExecToLog} '\
         "$PythonExecPrefix\python" -m pip install --upgrade \
              --isolated --no-cache-dir --no-index \
+             --no-warn-script-location \
              --find-links "${TEMPDIR}\wheels" \
              pip>=9 \
             '
@@ -554,6 +555,7 @@ Section "Install required packages" InstallPackages
     ${ExecToLog} '\
         "$PythonExecPrefix\python" -m pip install \
              --isolated --no-cache-dir --no-index \
+             --no-warn-script-location \
              --find-links "${TEMPDIR}\wheels" \
              -r "${TEMPDIR}\requirements.txt" \
         '

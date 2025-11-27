@@ -16,7 +16,7 @@ jobs:
     env:
       REPO: https://github.com/biolab/orange3.git
       BUILD_BRANCH: master
-      BUILD_COMMIT: "3.38.1"
+      BUILD_COMMIT: "3.39.0"
       BUILD_LOCAL: ""
 
       PYTHONFAULTHANDLER: 1
@@ -30,8 +30,8 @@ jobs:
       fail-fast: False
       matrix:
         include:
-          - python-version: "3.11"
-            micromamba-version: "2.1.0-0"
+          - python-version: "3.12"
+            micromamba-version: "2.3.3-0"
 
     defaults:
       run:
@@ -43,7 +43,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: "3.12"
 
       - uses: mamba-org/setup-micromamba@v1
         with:
@@ -80,12 +80,12 @@ jobs:
             micromamba create -p ./env --yes \
                          ${EXTRA_ARGS[*]} \
                          python=$PYTHON_VERSION \
-                         numpy=1.26.* \
+                         numpy=2.1.* \
                          scipy=1.13.* \
                          scikit-learn=1.5.2 \
-                         pandas=1.5.* \
+                         pandas=2.2.* \
                          pyqtgraph=0.13.* \
-                         bottleneck=1.3.* \
+                         bottleneck=1.4.* \
                          pyqt=5.15.* \
                          pyqtwebengine=5.15.* \
                          Orange3=$VERSION \
