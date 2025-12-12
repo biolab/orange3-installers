@@ -27,8 +27,7 @@ Options:
     --online (yes|no)       Build an \"online\" or \"offline\" installer.
                             In an online installer only the micromamba binary
                             is included. All other packages are otherwise
-                            fetched at installation time
-                            (offline is currently not recommended).
+                            fetched at installation time (default no).
     -h --help               Print this help
 
 
@@ -53,7 +52,7 @@ MICROMAMBA_VERSION=${MICROMAMBA_VERSION_DEFAULT}
 PLATTAG=win_amd64
 
 # online or offline installer.
-ONLINE=
+ONLINE=no
 
 # The default conda explicit env spec
 ENV_SPEC_FILE="$(dirname "$0")"/specs/conda-spec.txt
@@ -302,8 +301,6 @@ make-installer() {
     local extransisparams=()
     if [[ "${ONLINE}" == yes ]]; then
         extransisparams+=( -DONLINE )
-    else
-        cp "${scriptdir}/micromambainstall.bat" "${BASEDIR:?}"/install.bat
     fi
     local basedir=$(win-path "${BASEDIR:?}")
     local versionstr=${VERSION:?}
@@ -381,5 +378,6 @@ cp "${CACHEDIR:?}/micromamba/micromamba-${MICROMAMBA_VERSION}-win-64" \
 
 mkdir -p "${BASEDIR:?}/icons"
 cp "$(dirname "$0")"/{Orange.ico,OrangeOWS.ico} "${BASEDIR:?}/icons"
-cp "$(dirname "$0")"/sitecustomize.py "${BASEDIR:?}"/
+cp "$(dirname "$0")"/{sitecustomize.py,conda.bat} "${BASEDIR:?}"/
+cp "$(dirname "$0")"/condarc "${BASEDIR:?}"/.condarc
 make-installer

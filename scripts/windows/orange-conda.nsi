@@ -18,7 +18,9 @@
 
 # ${BASEDIR}/
 #   conda-pkgs/
-#   install.bat
+#   .condarc
+#   conda.bat
+#   sitecustomize.py
 #   conda-spec.txt
 
 Unicode True
@@ -266,6 +268,7 @@ Var SilentInstallDir
 Var PythonPrefix
 Var PythonExecPrefix
 Var PythonScriptsPrefix
+Var Micromamba
 
 Var LogFile
 !macro __LOG_INIT
@@ -423,12 +426,8 @@ Section "Install required packages" InstallPackages
         StrCpy $0 "create"
     ${EndIf}
 
-!ifdef ONLINE
-        ${ExtractTemp} "${BASEDIR}\conda-spec.txt" "${TEMPDIR}"
-!else
-        ${ExtractTemp} "${BASEDIR}\conda-spec.txt" "${TEMPDIR}"
-        ${ExtractTemp} "${BASEDIR}\install.bat" "${TEMPDIR}"
-        ${ExtractTemp} "${BASEDIR}\sitecustomize.py" "${TEMPDIR}"
+    ${ExtractTemp} "${BASEDIR}\conda-spec.txt" "${TEMPDIR}"
+!ifndef ONLINE
         ${ExtractTempRec} "${BASEDIR}\conda-pkgs\*.*" "$InstDir\pkgs"
 !endif  # ONLINE
 
@@ -436,40 +435,43 @@ Section "Install required packages" InstallPackages
     SetDetailsPrint none
     SetOutPath "${TEMPDIR}"
     SetDetailsPrint both
- !ifdef ONLINE
-    # Create an empty env first
-    ${If} $0 == "create"
-        # Create an empty initial skeleton to layout the conda, activate.bat
-        # and other things needed to manage the environment. Installing from
-        # an explicit package specification file does not do that.
-        ${ExecToLog} '\
-            "$InstDir\micromamba.exe" create \
-                --yes --quiet --prefix "$PythonPrefix" \
-            '
-        Pop $0
-        ${If} $0 != 0
-            Abort '"micromamba create" exited with $0. Cannot continue.'
-        ${EndIf}
-    ${EndIf}
-    DetailPrint "Fetching and installing packages (this might take a while)"
-    ${ExecToLog} '\
-        "$InstDir\micromamba.exe" install \
-            --yes --quiet \
-            --file "${TEMPDIR}\conda-spec.txt" \
-            --prefix "$PythonPrefix" \
-        '
-!else
-    # Run the install via from a helper script (informative output).
+    StrCpy $Micromamba "$InstDir\micromamba.exe"
+    DetailPrint "Creating an conda env"
+    # Just make sure that conda-meta dir is present, this is the minimum
+    # required to work. micromamba create refuses to create an env that is the
+    # same as the --root-prefix env.
+    CreateDirectory "$InstDir\conda-meta"
+    # Install packages
     DetailPrint "Installing packages (this might take a while)"
-    ${ExecToLog} 'cmd.exe /c install.bat "$PythonPrefix" "$InstDir\micromamba.exe"'
-!endif # ONLINE
+    ${ExecToLog} '\
+            "$Micromamba" --root-prefix "$InstDir" \
+                install --safety-checks disabled \
+                --yes --prefix "$InstDir" \
+                --file "${TEMPDIR}\conda-spec.txt" \
+            '
     Pop $0
+    ${If} $0 != 0
+        ${LogWrite} '"micromamba install" exited with $0. Cannot continue.'
+        Abort '"micromamba install" exited with $0. Cannot continue.'
+    ${EndIf}
+    # Install activate hook
+    DetailPrint "Installing activate hook"
+    ${ExecToLog} '\
+            "$Micromamba" --root-prefix "$InstDir" \
+                shell hook -s cmd.exe \
+            '
+    Pop $0
+    ${If} $0 != 0
+        ${LogWrite} '"micromamba shell hook" exited with $0. Cannot continue.'
+        Abort '"micromamba shell hook" exited with $0. Cannot continue.'
+    ${EndIf}
+    DetailPrint "Customizing installation"
+    ${ExtractTemp} "${BASEDIR}\.condarc" "$InstDir"
+    ${ExtractTemp} "${BASEDIR}\sitecustomize.py" "$InstDir\Lib"
+    ${ExtractTemp} "${BASEDIR}\conda.bat" "$InstDir\Scripts"
     SetDetailsPrint none
     Pop $OUTDIR
     SetDetailsPrint both
-    ${If} $0 != 0
-        Abort '"conda" command exited with $0. Cannot continue.'
-    ${EndIf}
 SectionEnd
 
 
