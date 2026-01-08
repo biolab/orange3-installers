@@ -23,6 +23,14 @@
 #   sitecustomize.py
 #   conda-spec.txt
 
+
+#env["PYTHONUTF8"] = "1"
+#env["PYTHONIOENCODING"] = "utf-8"
+
+System::Call 'Kernel32::SetEnvironmentVariable(t, t)i ("PYTHONUTF8", "1").r0'
+System::Call 'Kernel32::SetEnvironmentVariable(t, t)i ("PYTHONIOENCODING", "utf-8").r0'
+
+
 Unicode True
 
 # Short name, used in paths

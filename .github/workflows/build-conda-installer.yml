@@ -130,7 +130,7 @@ jobs:
     needs: build
     runs-on: windows-2022
     env:
-      INSTALL_PATH: "D:\\install path"
+      INSTALL_PATH: "D:\\install path čćž"
     steps:
       - name: Download installer
         uses: actions/download-artifact@v4
